@@ -4,8 +4,9 @@
   "description": "Node.js with Express, Sequelize & postgre",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon \"src/index.js\"",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint \"src/**/*.js\"",
+    "lint": "eslint \"src/**\"",
     "format": "prettier --write \"src/**/*.js\""
   },
   "repository": {
@@ -19,8 +20,11 @@
   },
   "homepage": "https://github.com/chwahajahmad/nodejs-practice#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "node-schedule": "^2.0.0",
+    "nodemon": "^2.0.12",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
     "restify": "^8.5.1",
