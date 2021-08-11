@@ -1,6 +1,6 @@
 const express = require('express');
-const postgre = require('./db.config');
-const scheduler = require('./ScheduledJobs/scheduler');
+const postgre = require('./db.conn');
+// const scheduler = require('./ScheduledJobs/scheduler');
 const app = express();
 const port = process.env.PORT || 3002;
 app.use(express.json());
