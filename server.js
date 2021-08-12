@@ -1,11 +1,12 @@
 const express = require('express');
 const sequelize = require('./db-config');
 const path = require('path');
+const getlist = require('./prayerAlertApis/apis');
+const cors = require('cors');
 
 const app = express();
-// app.get('/', (req, res) => {
-//   res.json({ message: 'Welcome to bezkoder application.' });
-// });
+app.use(cors());
+app.use('/api', getlist);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
