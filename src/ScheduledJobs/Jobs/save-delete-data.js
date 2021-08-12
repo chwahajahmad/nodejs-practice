@@ -5,7 +5,9 @@ const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?city=';
 
 const getSaveData = (city = 'lahore') => {
   axios.get(`${apiEndPoint}${city}`).then((res) => {
-    prayerTimeController.addPrayerTime({ body: { data: res.data.results } });
+    prayerTimeController.addPrayerTime({
+      body: { city, fiqah: 'Hanfi', data: res.data.results },
+    });
   });
 };
 

@@ -1,9 +1,11 @@
-const prayerDao = require('../DAOs/prayerTime.dao');
+const prayerTime = require('../models/prayerTime.models');
 
 const addPrayerTime = (req, res = null) => {
-  const prayerTime = req.body;
-  prayerDao
-    .create(prayerTime)
+  const time = req.body;
+
+  const newPrayerTime = new prayerTime(time);
+  newPrayerTime
+    .save()
     .then((data) => {
       if (res) res.send(data);
     })
@@ -13,8 +15,8 @@ const addPrayerTime = (req, res = null) => {
 };
 
 const findPrayerTimeById = (req, res) => {
-  prayerDao
-    .findById(req.params.id)
+  prayerTime
+    .findByPk(req.params.id)
     .then((data) => {
       res.send(data);
     })
@@ -23,36 +25,8 @@ const findPrayerTimeById = (req, res) => {
     });
 };
 
-const deleteById = (req, res) => {
-  prayerDao
-    .deleteById(req.params.id)
-    .then((data) => {
-      res.status(200).json({
-        message: 'Prayer Times deleted successfully',
-        prayerTimes: data,
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
-const updatePrayerTime = (req, res) => {
-  prayerDao
-    .updateGig(req.body, req.params.id)
-    .then((data) => {
-      res.status(200).json({
-        message: 'Gig updated successfully',
-        prayerTimes: data,
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
 const findPrayerTime = (req, res) => {
-  prayerDao
+  prayerTime
     .findAll()
     .then((data) => {
       console.log(data);
@@ -63,8 +37,8 @@ const findPrayerTime = (req, res) => {
 };
 
 const deleteAll = (req = null, res = null) => {
-  prayerDao
-    .deleteAll()
+  prayerTime
+    .destroy({ truncate: true })
     .then((data) => console.log(data))
     .catch((err) => console.log(err));
 };
@@ -72,8 +46,6 @@ const prayerTimesController = {
   addPrayerTime,
   findPrayerTime,
   findPrayerTimeById,
-  updatePrayerTime,
-  deleteById,
   deleteAll,
 };
 
