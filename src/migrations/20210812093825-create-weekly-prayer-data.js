@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('weekly-prayer-data', {
+    await queryInterface.createTable('weekly_prayer_data', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -30,6 +30,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('weekly-prayer-data');
+    await queryInterface.dropTable('weekly_prayer_data');
   },
 };
