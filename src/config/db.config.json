@@ -16,7 +16,7 @@
     "dialect": "postgres"
   },
   "production": {
-     "username": "wahaj_choudhry",
+    "username": "wahaj_choudhry",
     "password": 12345,
     "database": "prayerTime-DB",
     "host": "127.0.0.1",
