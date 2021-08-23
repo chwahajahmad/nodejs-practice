@@ -14,22 +14,25 @@ const addPrayerTime = (req, res = null) => {
     });
 };
 
-const findPrayerTimeById = (req, res) => {
-  prayerTime
-    .findByPk(req.params.id)
-    .then((data) => {
-      res.send(data);
+const findPrayerTimeByCityAndFiqah = async (city, fiqah) => {
+  const data = await prayerTime
+    .findAll({
+      where: {
+        city,
+        fiqah,
+      },
     })
-    .catch((error) => {
-      console.log(error);
+    .catch((err) => {
+      throw Error(err);
     });
+  return data;
 };
 
-const findPrayerTime = (req, res) => {
+const findPrayerTime = () => {
   prayerTime
     .findAll()
     .then((data) => {
-      console.log(data);
+      return data;
     })
     .catch((error) => {
       console.log(error);
@@ -45,7 +48,7 @@ const deleteAll = (req = null, res = null) => {
 const prayerTimesController = {
   addPrayerTime,
   findPrayerTime,
-  findPrayerTimeById,
+  findPrayerTimeByCityAndFiqah,
   deleteAll,
 };
 
