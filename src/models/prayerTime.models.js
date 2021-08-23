@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const db = require('../db.config');
+const db = require('../db.conn');
 
 const weekly_prayer_data = db.define(
   'weekly_prayer_data',
