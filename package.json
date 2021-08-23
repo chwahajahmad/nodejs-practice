@@ -1,5 +1,5 @@
 {
-  "name": "Slack Prayer Bot",
+  "name": "Slack-Prayer-Bot",
   "version": "1.0.0",
   "description": "Slack Bot that Alert people about Prayer Time",
   "main": "index.js",
