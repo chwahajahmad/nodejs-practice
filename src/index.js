@@ -1,7 +1,7 @@
 const express = require('express');
 const postgre = require('./db.conn');
 const scheduler = require('./ScheduledJobs/scheduler');
-
+const dailyReminderScheduler = require('./ScheduledJobs/Jobs/dailyReminders');
 const app = express();
 const port = process.env.PORT || 3002;
 

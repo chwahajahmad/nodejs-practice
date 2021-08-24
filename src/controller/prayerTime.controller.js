@@ -15,7 +15,7 @@ const addPrayerTime = (req, res = null) => {
 };
 
 const findPrayerTimeByCityAndFiqah = async (city, fiqah) => {
-  const data = await prayerTime
+  return await prayerTime
     .findAll({
       where: {
         city,
@@ -25,18 +25,12 @@ const findPrayerTimeByCityAndFiqah = async (city, fiqah) => {
     .catch((err) => {
       throw Error(err);
     });
-  return data;
 };
 
-const findPrayerTime = () => {
-  prayerTime
-    .findAll()
-    .then((data) => {
-      return data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+const findPrayerTime = async () => {
+  return await prayerTime.findAll().catch((error) => {
+    throw Error(error);
+  });
 };
 
 const deleteAll = (req = null, res = null) => {
