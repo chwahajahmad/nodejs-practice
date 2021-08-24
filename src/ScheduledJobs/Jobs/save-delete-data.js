@@ -1,7 +1,6 @@
 const axios = require('axios');
 const prayerTimeController = require('../../controller/prayerTime.controller');
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?city=';
-
 //dummy user data
 const userData = [
   {
@@ -64,4 +63,5 @@ const getSaveDataForSingleUser = (city, fiqah) => {
 const deleteAllData = () => {
   prayerTimeController.deleteAll();
 };
+
 module.exports = { getSaveData, deleteAllData };

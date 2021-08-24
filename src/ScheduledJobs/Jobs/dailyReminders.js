@@ -1,4 +1,6 @@
 const prayerTimeController = require('../../controller/prayerTime.controller');
+const postMessage = require('./postingMessage');
+const dayjs = require('dayjs');
 
 const userData = [
   {
@@ -7,7 +9,7 @@ const userData = [
     fiqah: 'Hanafi',
     slackData: {
       name: 'Ahmad Wahaj',
-      userId: 123,
+      userId: 'U02BXNRLBQD',
     },
   },
   {
@@ -16,7 +18,7 @@ const userData = [
     fiqah: 'Jafari',
     slackData: {
       name: 'Abdullah Iqbal',
-      userId: 124,
+      userId: 'C02BU1N3X8W',
     },
   },
   {
@@ -24,8 +26,8 @@ const userData = [
     city: 'Lahore',
     fiqah: 'Hanafi',
     slackData: {
-      name: 'Irteza Iqbal',
-      userId: 123,
+      name: 'Suraj Saxena',
+      userId: 'C02BL20HUK1',
     },
   },
   {
@@ -34,7 +36,7 @@ const userData = [
     fiqah: 'Hanafi',
     slackData: {
       name: 'Irteza Iqbal',
-      userId: 123,
+      userId: 'C02BXNRM7S9',
     },
   },
 ];
@@ -48,13 +50,22 @@ const setReminderForAll = () => {
         if (res.length <= 0) {
           throw Error('No Data Present Against Given City And Fiqah');
         } else {
-          //   logic about setting reminder goes here
-          //   console.log(res[0].dataValues.data.datetime[0]);
-          //   console.log(res[0].dataValues.data.location.timezone);
+          const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+          prayerTimes.map((namazName) => {
+            // const day = new Date().getDay();
+            // const message = `Its ${namazName} Time`;
+            // const channel = data.slackData.userId;
+            // const time =
+            //   res[0].dataValues.data.datetime[day - 1].times[namazName];
+            // const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
+            // const timestamp = dayjs(`${date} ${time}`).unix();
+            // postMessage(message, channel, timestamp);
+          });
         }
       });
   });
 };
+
 setReminderForAll();
 
 module.exports = setReminderForAll;
