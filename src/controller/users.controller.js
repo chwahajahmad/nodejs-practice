@@ -18,7 +18,7 @@ const addUser = async (req, res) => {
     });
     if (userData) {
       getSaveDataForSingleUser(city, fiqah);
-      setReminder(req.body);
+      setReminder({ ...req.body, slack_id: user_id });
       return true;
     }
   }
