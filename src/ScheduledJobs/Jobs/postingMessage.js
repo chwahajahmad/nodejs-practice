@@ -1,6 +1,8 @@
 const { WebClient } = require('@slack/web-api');
 const dayjs = require('dayjs');
-const token = 'xoxb-2408994401491-2409016581235-aNfHwYGcAPlIpfuN7mhLKwtW';
+const dotenv = require('dotenv');
+dotenv.config();
+const token = process.env.SLACKBOT_OAUTH_TOKEN;
 
 const web = new WebClient(token);
 // const getList = (async () => {
