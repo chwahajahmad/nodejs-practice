@@ -1,6 +1,6 @@
 const axios = require('axios');
 const prayerTimeController = require('../../controller/prayerTime.controller');
-const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?city=';
+const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
 //dummy user data
 const userData = [
   {
@@ -51,7 +51,9 @@ const getSaveData = () => {
 const getSaveDataForSingleUser = (city, fiqah) => {
   prayerTimeController.findPrayerTimeByCityAndFiqah(city, fiqah).then((res) => {
     if (res.length <= 0) {
-      axios.get(`${apiEndPoint}${city}`).then((res) => {
+      let school;
+      fiqah === 'Jafri' ? (school = 0) : (school = 1);
+      axios.get(`${apiEndPoint}city=${city}&school=${school}`).then((res) => {
         prayerTimeController.addPrayerTime({
           body: { city, fiqah, data: res.data.results },
         });
