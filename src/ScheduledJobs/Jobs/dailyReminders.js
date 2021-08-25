@@ -40,32 +40,37 @@ const userData = [
     },
   },
 ];
-
 const setReminderForAll = () => {
-  userData.map((data) => {
-    const { city, fiqah } = data;
-    prayerTimeController
-      .findPrayerTimeByCityAndFiqah(city, fiqah)
-      .then((res) => {
-        if (res.length <= 0) {
-          throw Error('No Data Present Against Given City And Fiqah');
-        } else {
-          const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-          prayerTimes.map((namazName) => {
-            // const day = new Date().getDay();
-            // const message = `Its ${namazName} Time`;
-            // const channel = data.slackData.userId;
-            // const time =
-            //   res[0].dataValues.data.datetime[day - 1].times[namazName];
-            // const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
-            // const timestamp = dayjs(`${date} ${time}`).unix();
-            // postMessage(message, channel, timestamp);
-          });
-        }
-      });
+  userData.forEach((data) => {
+    setReminder(data);
   });
 };
+const setReminder = (data) => {
+  const { city, fiqah } = data;
 
-setReminderForAll();
+  prayerTimeController
+    .findPrayerTimeByCityAndFiqah(city, fiqah)
+    .then((res) => {
+      const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+      prayerTimes.forEach((namazName) => {
+        const day = new Date().getDay();
+        const time = res[0].dataValues.data.datetime[day - 1].times[namazName];
+        const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
+
+        const message = `Its ${namazName} Time`;
+        const channel = data.slackData.userId;
+
+        const timeStamp = dayjs(`${date} ${time}`).unix();
+        const timeStampNow = dayjs().unix();
+
+        if (timeStampNow < timeStamp) postMessage(message, channel, timeStamp);
+      });
+    })
+    .catch((err) => {
+      throw Error(err);
+    });
+};
+// setReminderForAll();
 
 module.exports = setReminderForAll;

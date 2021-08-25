@@ -42,7 +42,7 @@ const userData = [
 ];
 
 const getSaveData = () => {
-  userData.map((data) => {
+  userData.forEach((data) => {
     const { city, fiqah } = data;
     getSaveDataForSingleUser(city, fiqah);
   });
