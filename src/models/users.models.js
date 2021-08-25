@@ -1,8 +1,8 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const db = require('../db.conn');
 
-const user = db.define(
-  'user',
+const users = db.define(
+  'users',
   {
     // Model attributes are defined here
     slack_id: {
@@ -14,12 +14,12 @@ const user = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    fiqa: {
+    fiqah: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     name: {
-      type: DataTypes.JSONB,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -31,4 +31,4 @@ const user = db.define(
 //   .sync()
 //   .then((res) => console.log(res))
 //   .catch((err) => console.log(err));
-module.exports = user;
+module.exports = users;

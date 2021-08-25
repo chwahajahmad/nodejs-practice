@@ -15,11 +15,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      fiqa: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      url: {
+      fiqah: {
         type: Sequelize.STRING,
         allowNull: false,
       },

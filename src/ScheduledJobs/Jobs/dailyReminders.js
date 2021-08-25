@@ -45,32 +45,32 @@ const setReminderForAll = () => {
     setReminder(data);
   });
 };
-const setReminder = (data) => {
+const setReminder = async (data) => {
   const { city, fiqah } = data;
+  console.log('reached here');
+  const res = await prayerTimeController.findPrayerTimeByCityAndFiqah(
+    city,
+    fiqah,
+  );
 
-  prayerTimeController
-    .findPrayerTimeByCityAndFiqah(city, fiqah)
-    .then((res) => {
-      const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+  if (res.length > 0) {
+    const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
-      prayerTimes.forEach((namazName) => {
-        const day = new Date().getDay();
-        const time = res[0].dataValues.data.datetime[day - 1].times[namazName];
-        const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
+    prayerTimes.forEach((namazName) => {
+      const day = new Date().getDay();
+      const time = res[0].dataValues.data.datetime[day - 1].times[namazName];
+      const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
 
-        const message = `Its ${namazName} Time`;
-        const channel = data.slackData.userId;
+      const message = `Its ${namazName} Time`;
+      const channel = data.user_id;
 
-        const timeStamp = dayjs(`${date} ${time}`).unix();
-        const timeStampNow = dayjs().unix();
+      const timeStamp = dayjs(`${date} ${time}`).unix();
+      const timeStampNow = dayjs().unix();
 
-        if (timeStampNow < timeStamp) postMessage(message, channel, timeStamp);
-      });
-    })
-    .catch((err) => {
-      throw Error(err);
+      // if (timeStampNow < timeStamp) postMessage(message, channel, timeStamp);
     });
+  }
 };
 // setReminderForAll();
 
-module.exports = setReminderForAll;
+module.exports = { setReminder, setReminderForAll };

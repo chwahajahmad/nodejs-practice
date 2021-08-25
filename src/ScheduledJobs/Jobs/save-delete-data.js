@@ -48,22 +48,28 @@ const getSaveData = () => {
   });
 };
 
-const getSaveDataForSingleUser = (city, fiqah) => {
-  prayerTimeController.findPrayerTimeByCityAndFiqah(city, fiqah).then((res) => {
-    if (res.length <= 0) {
-      let school;
-      fiqah === 'Jafri' ? (school = 0) : (school = 1);
-      axios.get(`${apiEndPoint}city=${city}&school=${school}`).then((res) => {
-        prayerTimeController.addPrayerTime({
-          body: { city, fiqah, data: res.data.results },
-        });
+const getSaveDataForSingleUser = async (city, fiqah) => {
+  const res = await prayerTimeController.findPrayerTimeByCityAndFiqah(
+    city,
+    fiqah,
+  );
+  if (res.length <= 0) {
+    let school;
+    fiqah === 'Jafri' ? (school = 0) : (school = 1);
+    axios.get(`${apiEndPoint}city=${city}&school=${school}`).then((res) => {
+      prayerTimeController.addPrayerTime({
+        body: {
+          city: city.toLowerCase(),
+          fiqah: fiqah.toLowerCase(),
+          data: res.data.results,
+        },
       });
-    }
-  });
+    });
+  }
 };
 
 const deleteAllData = () => {
   prayerTimeController.deleteAll();
 };
 
-module.exports = { getSaveData, deleteAllData };
+module.exports = { getSaveData, deleteAllData, getSaveDataForSingleUser };

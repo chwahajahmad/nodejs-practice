@@ -1,8 +1,10 @@
 const express = require('express');
 const WorldCities = require('worldcities');
+const operations = require('../controller/users.controller');
+const axios = require('axios');
 const router = express.Router();
-
 router.post('/', (req, res) => {
+  console.log('here');
   if (req.body.command === '/subscribe') {
     const details = VerifyRequest(req.body.text);
     if (!details) {
@@ -13,7 +15,17 @@ router.post('/', (req, res) => {
     } else {
       res.status(200).send('Got you Mate');
       req.body = { ...req.body, ...details };
-      console.log(req.body);
+      const addData = (async () => {
+        const result = await operations.addUser(req, res);
+        let text;
+        result
+          ? (text = 'Request Successful.')
+          : (text = 'Something Went Wrong.');
+        axios.post(req.body.response_url, {
+          replace_original: 'true',
+          text,
+        });
+      })();
     }
   }
 });
@@ -34,11 +46,11 @@ const VerifyRequest = (text) => {
   const fiqah = text.slice(text.lastIndexOf('--') + 2, text.length);
 
   if (
-    !(fiqah.toLowerCase() === 'jafri' || fiqah.toLowerCase() === 'hanfi') ||
+    !(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi') ||
     WorldCities.getByName(city) === undefined
   )
     return false;
-  return { city, fiqah };
+  return { city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
 };
 // VerifyRequest('--lahores --Hanfi');
 module.exports = router;
