@@ -1,29 +1,26 @@
 const express = require('express');
 const WorldCities = require('worldcities');
-const operations = require('../controller/users.controller');
+const { addUser } = require('../controller/users.controller');
 const axios = require('axios');
 const router = express.Router();
+
 router.post('/', (req, res) => {
-  console.log('here');
   if (req.body.command === '/subscribe') {
     const details = VerifyRequest(req.body.text);
-    if (!details) {
+    if (!details.status) {
       res.status(200).json({
         response_type: 'ephemeral',
-        text: "Sorry, Slash Commando, that didn't work. Please try again.",
+        text: details.message,
       });
     } else {
       res.status(200).send('Got you Mate');
       req.body = { ...req.body, ...details };
-      const addData = (async () => {
-        const result = await operations.addUser(req, res);
-        let text;
-        result
-          ? (text = 'Request Successful.')
-          : (text = 'Something Went Wrong.');
+      (async () => {
+        const result = await addUser(req, res);
+
         axios.post(req.body.response_url, {
           replace_original: 'true',
-          text,
+          text: result,
         });
       })();
     }
@@ -36,7 +33,10 @@ const VerifyRequest = (text) => {
     text.indexOf('--') === -1 ||
     text.indexOf('--') === text.lastIndexOf('--')
   )
-    return false;
+    return {
+      status: false,
+      message: 'Make Sure You have added City And Fiqah',
+    };
   const city = text.slice(
     text.indexOf('--') + 2,
     text.charAt(text.lastIndexOf('--') - 1) === ' '
@@ -49,8 +49,8 @@ const VerifyRequest = (text) => {
     !(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi') ||
     WorldCities.getByName(city) === undefined
   )
-    return false;
-  return { city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
+    return { status: false, message: 'Fiqah Should Be Jafari or Hanafi' };
+  return { status: true, city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
 };
 // VerifyRequest('--lahores --Hanfi');
 module.exports = router;

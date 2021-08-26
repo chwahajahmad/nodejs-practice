@@ -1,15 +1,11 @@
 const prayerTimeController = require('../../controller/prayerTime.controller');
-const postMessage = require('./postingMessage');
+const { postMessage } = require('./slackTasks');
 const User = require('../../controller/users.controller');
 const dayjs = require('dayjs');
+const { updateChannel } = require('../../controller/users.controller');
 
-const setReminderForAll = async () => {
-  const userData = await User.findAllUsers();
-  userData.forEach((data) => setReminder(data.dataValues));
-};
 const setReminder = async (data) => {
   const { city, fiqah } = data;
-  console.log('reached here');
   const res = await prayerTimeController.findPrayerTimeByCityAndFiqah(
     city,
     fiqah,
@@ -29,9 +25,24 @@ const setReminder = async (data) => {
       const timeStamp = dayjs(`${date} ${time}`).unix();
       const timeStampNow = dayjs().unix();
 
-      if (timeStampNow < timeStamp) postMessage(message, channel, timeStamp);
+      if (timeStampNow < timeStamp) {
+        postMessage(message, channel, timeStamp).then((res) => {
+          if (data.newUser) {
+            updateChannel(res.channel, data.slack_id);
+            data.newUser = false;
+          }
+        });
+      }
     });
   }
 };
+const setReminderForAll = async () => {
+  const userData = await User.findAllUsers();
+  userData.forEach((data) => {
+    setReminder(data.dataValues);
+  });
+};
+// setReminder({ city: 'Lahore', fiqah: 'Hanafi', slack_id: 'U02BXNRLBQD' });
 
-module.exports = { setReminder, setReminderForAll };
+module.exports.setReminder = setReminder;
+module.exports.setReminderForAll = setReminderForAll;

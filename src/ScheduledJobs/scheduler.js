@@ -10,7 +10,7 @@ module.exports.weeklyDataGetterScheduler = schedule.scheduleJob(
 );
 
 module.exports.dailyReminderScheduler = schedule.scheduleJob(
-  '0 12 1-31 */1 *',
+  '05 00 1-31 */1 *',
   () => {
     setReminderForAll();
   },

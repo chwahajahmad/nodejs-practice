@@ -1,14 +1,14 @@
 const user = require('../models/users.models');
-const { setReminder } = require('../ScheduledJobs/Jobs/dailyReminders');
 const {
   getSaveDataForSingleUser,
 } = require('../ScheduledJobs/Jobs/save-delete-data');
-
+const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+const { deleteScheduledMessage } = require('../ScheduledJobs/Jobs/slackTasks');
 const addUser = async (req, res) => {
   const { user_id, fiqah, city, user_name } = req.body;
   console.log(req.body);
   const userExists = await findOneUser(user_id);
-  if (userExists) return false;
+  if (userExists) return 'User Already Exists';
   else {
     const userData = await user.create({
       slack_id: user_id,
@@ -18,12 +18,25 @@ const addUser = async (req, res) => {
     });
     if (userData) {
       getSaveDataForSingleUser(city, fiqah);
-      setReminder({ ...req.body, slack_id: user_id });
-      return true;
+      reminders.setReminder({ ...req.body, slack_id: user_id, newUser: true });
+      return 'Request Successful';
     }
+    return 'Request Unsuccessful';
   }
 };
 
+const updateChannel = async (channel_id, slack_id) => {
+  return await user.update(
+    {
+      channel_id,
+    },
+    {
+      where: {
+        slack_id,
+      },
+    },
+  );
+};
 const findOneUser = async (id) => {
   if (id)
     return await user
@@ -43,16 +56,26 @@ const findAllUsers = async () => {
   });
 };
 
-const deleteUser = async (slack_id) => {
-  return await user
-    .destroy({
-      where: {
-        slack_id,
-      },
-    })
-    .catch((error) => {
-      throw Error(error);
-    });
+const deleteUser = async (req, res) => {
+  const userExist = await findOneUser(req.user_id);
+  console.log(userExist);
+  if (userExist) {
+    console.log('USER:', userExist);
+    // deleteScheduledMessage(userExi)
+    // return await user
+    //   .destroy({
+    //     where: {
+    //       slack_id,
+    //     },
+    //   })
+    //   .catch(() => {
+    //     return {
+    //       status: false,
+    //       message: 'You will not recieve any reminders!',
+    //     };
+    //   });
+  }
+  return { status: false, message: 'User does not Exist' };
 };
 // deleteUser('U02BXNRLBQD');
 // const updateFiqah = async (slack_id, fiqah) => {
@@ -85,6 +108,7 @@ const prayerTimesController = {
   findOneUser,
   findAllUsers,
   deleteUser,
+  updateChannel,
   // updateCity,
   // updateFiqah,
 };

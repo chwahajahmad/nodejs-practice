@@ -22,6 +22,9 @@ const users = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    channel_id: {
+      type: DataTypes.STRING,
+    },
   },
   {
     freezeTableName: true,

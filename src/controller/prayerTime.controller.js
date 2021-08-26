@@ -18,8 +18,8 @@ const findPrayerTimeByCityAndFiqah = async (city, fiqah) => {
   return await prayerTime
     .findAll({
       where: {
-        city,
-        fiqah,
+        city: city.toLowerCase(),
+        fiqah: fiqah.toLowerCase(),
       },
     })
     .catch((err) => {
