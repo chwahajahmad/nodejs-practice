@@ -2,7 +2,7 @@ const user = require('../models/users.models');
 const { deleteScheduledMessage } = require('../ScheduledJobs/Jobs/slackTasks');
 
 const addUser = async (req, res) => {
-  const { user_id, fiqah, city, user_name } = req.body;
+  const { user_id, fiqah, city, user_name, channel_id } = req.body;
   console.log(req.body);
   const userExists = await findOneUser(user_id);
   if (userExists) return 'User Already Exists';
@@ -12,13 +12,14 @@ const addUser = async (req, res) => {
       fiqah,
       city,
       name: user_name,
+      channel_id,
     });
     if (userData) {
       const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
       const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 
       savePrayerData.getSaveDataForSingleUser(city, fiqah);
-      reminders.setReminder({ ...req.body, slack_id: user_id, newUser: true });
+      reminders.setReminder({ ...req.body, slack_id: user_id });
       return 'Request Successful';
     }
     return 'Request Unsuccessful';

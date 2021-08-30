@@ -6,23 +6,32 @@ const router = express.Router();
 
 router.post('/', (req, res) => {
   if (req.body.command === '/subscribe') {
-    const details = VerifyRequest(req.body.text);
-    if (!details.status) {
-      res.status(200).json({
-        response_type: 'ephemeral',
-        text: details.message,
-      });
-    } else {
-      res.status(200).send('Got you Mate');
-      req.body = { ...req.body, ...details };
-      (async () => {
-        const result = await addUser(req, res);
-
-        axios.post(req.body.response_url, {
-          replace_original: true,
-          text: result,
+    if (req.body.channel_name === 'directmessage') {
+      const details = VerifyRequest(req.body.text);
+      if (!details.status) {
+        res.status(200).json({
+          response_type: 'ephemeral',
+          text: details.message,
         });
-      })();
+      } else {
+        console.log(req.body);
+        res.status(200).send('Got you Mate');
+        req.body = { ...req.body, ...details };
+        (async () => {
+          const result = await addUser(req, res);
+
+          axios.post(req.body.response_url, {
+            replace_original: true,
+            text: result,
+          });
+        })();
+      }
+    } else {
+      res
+        .status(200)
+        .send(
+          'Unable to process your request. \n Please send this command in direct message with Slack Prayer Bot App.',
+        );
     }
   }
 });

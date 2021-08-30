@@ -25,12 +25,7 @@ const setReminder = async (data) => {
       const timeStampNow = dayjs().unix();
 
       if (timeStampNow < timeStamp) {
-        postMessage(message, channel, timeStamp).then((res) => {
-          if (data.newUser) {
-            User.updateChannel(res.channel, data.slack_id);
-            data.newUser = false;
-          }
-        });
+        postMessage(message, channel, timeStamp);
       }
     });
   }
