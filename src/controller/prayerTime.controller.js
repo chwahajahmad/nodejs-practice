@@ -39,11 +39,10 @@ const deleteAll = (req = null, res = null) => {
     .then((data) => console.log(data))
     .catch((err) => console.log(err));
 };
-const prayerTimesController = {
+
+module.exports = {
   addPrayerTime,
   findPrayerTime,
   findPrayerTimeByCityAndFiqah,
   deleteAll,
 };
-
-module.exports = prayerTimesController;

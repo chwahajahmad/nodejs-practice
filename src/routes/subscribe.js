@@ -19,14 +19,40 @@ router.post('/', (req, res) => {
         const result = await addUser(req, res);
 
         axios.post(req.body.response_url, {
-          replace_original: 'true',
+          replace_original: true,
           text: result,
         });
       })();
     }
   }
 });
+const cityValidator = (city) => {
+  city = city.trim();
+  if (WorldCities.getByName(city) === undefined)
+    return {
+      status: false,
+      message: 'City Not Found',
+    };
+  else
+    return {
+      status: true,
+      message: 'All Good!',
+    };
+};
 
+const fiqahValidator = (fiqah) => {
+  fiqah = fiqah.trim();
+  if (!(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi'))
+    return {
+      status: false,
+      message: 'Fiqah Should Be Hanafi or Jafari',
+    };
+  else
+    return {
+      status: true,
+      message: 'All Good!',
+    };
+};
 const VerifyRequest = (text) => {
   if (
     text.length <= 0 ||
@@ -35,7 +61,7 @@ const VerifyRequest = (text) => {
   )
     return {
       status: false,
-      message: 'Make Sure You have added City And Fiqah',
+      message: 'Make Sure You have added City and Fiqah',
     };
   const city = text.slice(
     text.indexOf('--') + 2,
@@ -45,12 +71,15 @@ const VerifyRequest = (text) => {
   );
   const fiqah = text.slice(text.lastIndexOf('--') + 2, text.length);
 
-  if (
-    !(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi') ||
-    WorldCities.getByName(city) === undefined
-  )
-    return { status: false, message: 'Fiqah Should Be Jafari or Hanafi' };
+  const fiqahValidation = fiqahValidator(fiqah);
+  const cityValidation = cityValidator(city);
+
+  if (!fiqahValidation.status) return fiqahValidation;
+  if (!cityValidation.status) return cityValidation;
+
   return { status: true, city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
 };
-// VerifyRequest('--lahores --Hanfi');
+// VerifyRequest('--lahore --Hanfi');
 module.exports = router;
+module.exports.cityValidator = cityValidator;
+module.exports.fiqahValidator = fiqahValidator;

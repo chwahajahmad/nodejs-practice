@@ -1,8 +1,7 @@
+const User = require('../../controller/users.controller.js');
+const dayjs = require('dayjs');
 const prayerTimeController = require('../../controller/prayerTime.controller');
 const { postMessage } = require('./slackTasks');
-const User = require('../../controller/users.controller');
-const dayjs = require('dayjs');
-const { updateChannel } = require('../../controller/users.controller');
 
 const setReminder = async (data) => {
   const { city, fiqah } = data;
@@ -28,7 +27,7 @@ const setReminder = async (data) => {
       if (timeStampNow < timeStamp) {
         postMessage(message, channel, timeStamp).then((res) => {
           if (data.newUser) {
-            updateChannel(res.channel, data.slack_id);
+            User.updateChannel(res.channel, data.slack_id);
             data.newUser = false;
           }
         });
@@ -44,5 +43,7 @@ const setReminderForAll = async () => {
 };
 // setReminder({ city: 'Lahore', fiqah: 'Hanafi', slack_id: 'U02BXNRLBQD' });
 
-module.exports.setReminder = setReminder;
-module.exports.setReminderForAll = setReminderForAll;
+module.exports = {
+  setReminder,
+  setReminderForAll,
+};

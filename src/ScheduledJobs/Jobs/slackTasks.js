@@ -8,6 +8,7 @@ const getScheduledMessages = async (channel) => {
     channel,
   });
 };
+
 const deleteScheduledMessage = async (channel) => {
   const messages = await getScheduledMessages(channel);
 
@@ -29,4 +30,4 @@ const postMessage = async (text, channel, post_at) => {
   });
 };
 
-module.exports = { postMessage, deleteScheduledMessage, getScheduledMessages };
+module.exports = { deleteScheduledMessage, postMessage, getScheduledMessages };

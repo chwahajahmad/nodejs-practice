@@ -2,7 +2,7 @@ const express = require('express');
 const postgre = require('./db.conn');
 const scheduler = require('./ScheduledJobs/scheduler');
 const dailyReminderScheduler = require('./ScheduledJobs/Jobs/dailyReminders');
-const subscribeRoute = require('./routes/subsribe');
+const subscribeRoute = require('./routes/subscribe');
 const unsubscribeRoute = require('./routes/unsubscribe');
 
 const app = express();

@@ -1,9 +1,6 @@
 const user = require('../models/users.models');
-const {
-  getSaveDataForSingleUser,
-} = require('../ScheduledJobs/Jobs/save-delete-data');
-const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 const { deleteScheduledMessage } = require('../ScheduledJobs/Jobs/slackTasks');
+
 const addUser = async (req, res) => {
   const { user_id, fiqah, city, user_name } = req.body;
   console.log(req.body);
@@ -17,7 +14,10 @@ const addUser = async (req, res) => {
       name: user_name,
     });
     if (userData) {
-      getSaveDataForSingleUser(city, fiqah);
+      const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
+      const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+
+      savePrayerData.getSaveDataForSingleUser(city, fiqah);
       reminders.setReminder({ ...req.body, slack_id: user_id, newUser: true });
       return 'Request Successful';
     }
@@ -56,24 +56,23 @@ const findAllUsers = async () => {
   });
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req) => {
   const userExist = await findOneUser(req.user_id);
-  console.log(userExist);
   if (userExist) {
-    console.log('USER:', userExist);
-    // deleteScheduledMessage(userExi)
-    // return await user
-    //   .destroy({
-    //     where: {
-    //       slack_id,
-    //     },
-    //   })
-    //   .catch(() => {
-    //     return {
-    //       status: false,
-    //       message: 'You will not recieve any reminders!',
-    //     };
-    //   });
+    deleteScheduledMessage(userExist.dataValues.channel_id);
+    await user
+      .destroy({
+        where: {
+          slack_id: req.user_id,
+        },
+      })
+      .catch(() => {
+        return {
+          status: false,
+          message: 'Error Processing Request',
+        };
+      });
+    return { status: false, message: 'You will not recieve any reminders!' };
   }
   return { status: false, message: 'User does not Exist' };
 };
@@ -103,14 +102,10 @@ const deleteUser = async (req, res) => {
 //   );
 // };
 
-const prayerTimesController = {
+module.exports = {
   addUser,
   findOneUser,
   findAllUsers,
   deleteUser,
   updateChannel,
-  // updateCity,
-  // updateFiqah,
 };
-
-module.exports = prayerTimesController;
