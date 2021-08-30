@@ -15,6 +15,7 @@ const addPrayerTime = (req, res = null) => {
 };
 
 const findPrayerTimeByCityAndFiqah = async (city, fiqah) => {
+  console.log('Here:', city, fiqah);
   return await prayerTime
     .findAll({
       where: {

@@ -60,6 +60,7 @@ const deleteUser = async (req) => {
   const userExist = await findOneUser(req.user_id);
   if (userExist) {
     deleteScheduledMessage(userExist.dataValues.channel_id);
+
     await user
       .destroy({
         where: {
@@ -77,30 +78,84 @@ const deleteUser = async (req) => {
   return { status: false, message: 'User does not Exist' };
 };
 // deleteUser('U02BXNRLBQD');
-// const updateFiqah = async (slack_id, fiqah) => {
-//   return await user.update(
-//     {
-//       fiqah,
-//     },
-//     {
-//       where: {
-//         slack_id,
-//       },
-//     },
-//   );
-// };
-// const updateCity = async (slack_id, fiqah) => {
-//   return await user.update(
-//     {
-//       fiqah,
-//     },
-//     {
-//       where: {
-//         slack_id,
-//       },
-//     },
-//   );
-// };
+const updateFiqah = async (req, res) => {
+  const userExist = await findOneUser(req.body.user_id);
+  if (userExist) {
+    const isUpdated = await user.update(
+      {
+        fiqah: req.body.fiqah,
+      },
+      {
+        where: {
+          slack_id: req.body.user_id,
+        },
+      },
+    );
+    if (isUpdated) {
+      const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
+      const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+
+      deleteScheduledMessage(userExist.dataValues.channel_id);
+
+      savePrayerData.getSaveDataForSingleUser(
+        userExist.dataValues.city,
+        req.body.fiqah,
+      );
+      reminders.setReminder({
+        ...req.body,
+        city: userExist.dataValues.city,
+        slack_id: req.body.user_id,
+      });
+      return {
+        status: true,
+        message: `You have now subscribed for Fiqah *${req.body.text
+          .toUpperCase()
+          .trim()}*`,
+      };
+    }
+    return { status: false, message: 'Internal Error' };
+  }
+  return { status: false, message: 'User Does not exist' };
+};
+const updateCity = async (req, res) => {
+  const userExist = await findOneUser(req.body.user_id);
+  if (userExist) {
+    const isUpdated = await user.update(
+      {
+        city: req.body.city,
+      },
+      {
+        where: {
+          slack_id: req.body.user_id,
+        },
+      },
+    );
+    if (isUpdated) {
+      const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
+      const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+
+      deleteScheduledMessage(userExist.dataValues.channel_id);
+
+      savePrayerData.getSaveDataForSingleUser(
+        req.body.city,
+        userExist.dataValues.fiqah,
+      );
+      reminders.setReminder({
+        ...req.body,
+        fiqah: userExist.dataValues.fiqah,
+        slack_id: req.body.user_id,
+      });
+      return {
+        status: true,
+        message: `You have now subscribed for *${req.body.text
+          .toUpperCase()
+          .trim()}*`,
+      };
+    }
+    return { status: false, message: 'Internal Error' };
+  }
+  return { status: true, message: 'User Does not exist' };
+};
 
 module.exports = {
   addUser,
@@ -108,4 +163,6 @@ module.exports = {
   findAllUsers,
   deleteUser,
   updateChannel,
+  updateFiqah,
+  updateCity,
 };

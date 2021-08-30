@@ -10,7 +10,7 @@ const getSaveDataForSingleUser = async (city, fiqah) => {
   );
   if (res.length <= 0) {
     let school;
-    fiqah === 'Jafri' ? (school = 0) : (school = 1);
+    fiqah.toLowerCase() === 'jafari' ? (school = 0) : (school = 1);
     axios.get(`${apiEndPoint}city=${city}&school=${school}`).then((res) => {
       prayerTimeController.addPrayerTime({
         body: {
