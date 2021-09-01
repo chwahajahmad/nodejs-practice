@@ -11,14 +11,16 @@ const getSaveDataForSingleUser = async (city, fiqah) => {
   if (res.length <= 0) {
     let school;
     fiqah.toLowerCase() === 'jafari' ? (school = 0) : (school = 1);
-    axios.get(`${apiEndPoint}city=${city}&school=${school}`).then((res) => {
-      prayerTimeController.addPrayerTime({
-        body: {
-          city: city.toLowerCase(),
-          fiqah: fiqah.toLowerCase(),
-          data: res.data.results,
-        },
-      });
+    const weeklyData = await axios.get(
+      `${apiEndPoint}city=${city}&school=${school}`,
+    );
+
+    await prayerTimeController.addPrayerTime({
+      body: {
+        city: city.toLowerCase(),
+        fiqah: fiqah.toLowerCase(),
+        data: weeklyData.data.results,
+      },
     });
   }
 };
@@ -32,8 +34,8 @@ const getSaveData = async () => {
   });
 };
 
-const deleteAllData = () => {
-  prayerTimeController.deleteAll();
+const deleteAllData = async () => {
+  await prayerTimeController.deleteAll();
 };
 
 module.exports = { getSaveDataForSingleUser, deleteAllData, getSaveData };

@@ -14,15 +14,13 @@ router.post('/', (req, res) => {
           text: details.message,
         });
       } else {
-        console.log(req.body);
         res.status(200).send('Got you Mate');
         req.body = { ...req.body, ...details };
         (async () => {
           const result = await addUser(req, res);
-
           axios.post(req.body.response_url, {
             replace_original: true,
-            text: result,
+            text: result.message,
           });
         })();
       }

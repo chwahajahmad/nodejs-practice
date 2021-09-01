@@ -36,7 +36,6 @@ const setReminderForAll = async () => {
     setReminder(data.dataValues);
   });
 };
-// setReminder({ city: 'Lahore', fiqah: 'Hanafi', slack_id: 'U02BXNRLBQD' });
 
 module.exports = {
   setReminder,
