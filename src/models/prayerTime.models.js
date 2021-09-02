@@ -27,8 +27,4 @@ const weekly_prayer_data = db.define(
     freezeTableName: true,
   },
 );
-// weekly_prayer_data
-//   .sync()
-//   .then((res) => console.log(res))
-//   .catch((err) => console.log(err));
 module.exports = weekly_prayer_data;
