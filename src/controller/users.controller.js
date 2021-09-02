@@ -1,53 +1,65 @@
 const user = require('../models/users.models');
 const { deleteScheduledMessage } = require('../ScheduledJobs/Jobs/slackTasks');
+const { findOneUser } = require('../utils/users.utils');
+const {
+  VerifyRequest,
+} = require('../utils/inputValidation/users-validation.utils');
+const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
+const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 
-const addUser = async (req) => {
-  const { user_id, fiqah, city, user_name, channel_id } = req.body;
-  const userExists = await findOneUser(user_id);
+const addUser = async (req, res) => {
+  if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
+    return res.status(200).json({ text: 'Missing Necessary data' });
 
-  if (userExists) return { status: false, message: 'User Already Exists' };
-
-  const userData = await user.create({
-    slack_id: user_id,
-    fiqah,
-    city,
-    name: user_name,
-    channel_id,
-  });
-  if (userData) {
-    const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
-    const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
-
-    await savePrayerData.getSaveDataForSingleUser(city, fiqah);
-    await reminders.setReminder({ ...req.body, slack_id: user_id });
-
-    return { status: true, message: 'Request Successful' };
-  }
-  return { status: false, message: 'Internal Error' };
-};
-
-const updateChannel = async (channel_id, slack_id) => {
-  return await user.update(
-    {
-      channel_id,
-    },
-    {
-      where: {
-        slack_id,
-      },
-    },
-  );
-};
-const findOneUser = (id) => {
-  if (id)
-    return user.findOne({
-      where: {
-        slack_id: id,
-      },
+  if (req.body.channel_name !== 'directmessage')
+    return res.status(200).json({
+      text: 'Unable to process your request. \n Please send this command in direct message with Slack Prayer Bot App.',
     });
-};
 
-const findAllUsers = () => user.findAll();
+  const params = VerifyRequest(req.body.text);
+
+  if (!params.status) res.status(200).json({ text: params.message });
+
+  const { city, fiqah } = params;
+  const { user_id, user_name, channel_id } = req.body;
+
+  try {
+    const userExists = await findOneUser(user_id);
+    if (userExists)
+      return res.status(200).json({ text: 'User Already Exists' });
+  } catch (err) {
+    return res.status(200).json({ text: 'Error Fetching User Data' });
+  }
+
+  try {
+    const userData = await user.create({
+      slack_id: user_id,
+      fiqah,
+      city,
+      name: user_name,
+      channel_id,
+    });
+    if (!userData) return res.status(200).json({ text: 'Error Creating User' });
+  } catch (error) {
+    return res.status(200).json({ text: 'Internal Error(User Creation)' });
+  }
+  try {
+    await savePrayerData.getSaveDataForSingleUser(city, fiqah);
+  } catch (err) {
+    return res.status(200).json({ text: 'Error Gettin/Saving Prayer Data' });
+  }
+  try {
+    await reminders.setReminder({
+      ...req.body,
+      city,
+      fiqah,
+      slack_id: user_id,
+    });
+  } catch (err) {
+    return res.status(200).json({ text: 'Error Setting Reminder' });
+  }
+  return res.status(200).json({ text: 'You have subscribed Successfully' });
+};
 
 const deleteUser = async (req) => {
   const userExist = await findOneUser(req.user_id);
@@ -159,9 +171,7 @@ const updateCity = async (req) => {
 module.exports = {
   addUser,
   findOneUser,
-  findAllUsers,
   deleteUser,
-  updateChannel,
   updateFiqah,
   updateCity,
 };
