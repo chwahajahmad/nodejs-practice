@@ -1,13 +1,15 @@
 const user = require('../models/users.models');
-const { deleteScheduledMessage } = require('../ScheduledJobs/Jobs/slackTasks');
+const { deleteScheduledMessage } = require('../services/slackTasks');
 const { findOneUser } = require('../utils/users.utils');
 const {
   VerifyRequest,
+  fiqahValidator,
+  cityValidator,
 } = require('../utils/inputValidation/users-validation.utils');
 const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
 const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 
-const addUser = async (req, res) => {
+const addUser = async (req, res, _next) => {
   if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
     return res.status(200).json({ text: 'Missing Necessary data' });
 
@@ -18,7 +20,7 @@ const addUser = async (req, res) => {
 
   const params = VerifyRequest(req.body.text);
 
-  if (!params.status) res.status(200).json({ text: params.message });
+  if (!params.status) return res.status(200).json({ text: params.message });
 
   const { city, fiqah } = params;
   const { user_id, user_name, channel_id } = req.body;
@@ -32,6 +34,14 @@ const addUser = async (req, res) => {
   }
 
   try {
+    await savePrayerData.getSaveDataForSingleUser(city, fiqah);
+  } catch (err) {
+    return res
+      .status(200)
+      .json({ text: 'Error Getting/Saving Prayer Data(City not Found)' });
+  }
+
+  try {
     const userData = await user.create({
       slack_id: user_id,
       fiqah,
@@ -40,14 +50,10 @@ const addUser = async (req, res) => {
       channel_id,
     });
     if (!userData) return res.status(200).json({ text: 'Error Creating User' });
-  } catch (error) {
+  } catch (err) {
     return res.status(200).json({ text: 'Internal Error(User Creation)' });
   }
-  try {
-    await savePrayerData.getSaveDataForSingleUser(city, fiqah);
-  } catch (err) {
-    return res.status(200).json({ text: 'Error Gettin/Saving Prayer Data' });
-  }
+
   try {
     await reminders.setReminder({
       ...req.body,
@@ -58,119 +64,183 @@ const addUser = async (req, res) => {
   } catch (err) {
     return res.status(200).json({ text: 'Error Setting Reminder' });
   }
+
   return res.status(200).json({ text: 'You have subscribed Successfully' });
 };
 
-const deleteUser = async (req) => {
-  const userExist = await findOneUser(req.user_id);
-  if (userExist) {
+const deleteUser = async (req, res, _next) => {
+  if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
+    return res.status(200).json({ text: 'Missing Necessary data' });
+
+  const { user_id: slack_id } = req.body;
+
+  const userExist = await findOneUser(slack_id);
+
+  if (!userExist) return res.status(200).json({ text: 'User Does not Exist!' });
+
+  try {
     deleteScheduledMessage(userExist.dataValues.channel_id);
-
-    await user
-      .destroy({
-        where: {
-          slack_id: req.user_id,
-        },
-      })
-      .catch(() => {
-        return {
-          status: false,
-          message: 'Error Processing Request',
-        };
-      });
-    return { status: true, message: 'You will not recieve any reminders!' };
+  } catch (err) {
+    return res.status(200).json({ text: 'Error Deleting Scheduled Messages!' });
   }
-  return { status: false, message: 'User does not Exist' };
+
+  try {
+    await user.destroy({
+      where: {
+        slack_id,
+      },
+    });
+  } catch (err) {
+    res.status(200).json({ text: 'Error Deleting User!' });
+  }
+
+  return res
+    .status(200)
+    .json({ text: 'You will not receive reminders anymore!' });
 };
-const updateFiqah = async (req) => {
-  const userExist = await findOneUser(req.body.user_id);
-  if (userExist) {
-    if (userExist.dataValues.fiqah === req.body.fiqah)
-      return { status: false, message: 'Your current fiqah is also same!' };
-    const isUpdated = await user.update(
-      {
-        fiqah: req.body.fiqah,
-      },
-      {
-        where: {
-          slack_id: req.body.user_id,
-        },
-      },
-    );
-    if (isUpdated) {
-      const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
-      const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 
-      deleteScheduledMessage(userExist.dataValues.channel_id);
+const updateFiqah = async (req, res, _next) => {
+  if (!req.body.text || !req.body.user_id)
+    return res.status(200).json({ text: 'Invalid Input!' });
 
+  const fiqah = req.body.text.trim();
+  const slack_id = req.body.user_id;
+
+  const details = fiqahValidator(fiqah);
+  if (!details.status)
+    return res.status(200).json({
+      text: details.message,
+    });
+
+  try {
+    const userExist = await findOneUser(slack_id);
+    if (!userExist)
+      return res.status(200).json({ text: 'You have not Subscribed!' });
+    if (userExist.dataValues.fiqah === fiqah)
+      return res
+        .status(200)
+        .json({ text: 'You have already subscribed for same fiqah!' });
+
+    const { channel_id } = userExist.dataValues;
+
+    try {
       await savePrayerData.getSaveDataForSingleUser(
         userExist.dataValues.city,
-        req.body.fiqah,
+        fiqah,
       );
-
+    } catch (err) {
+      return res.status(200).json({ text: 'Error Saving Data for city' });
+    }
+    try {
+      deleteScheduledMessage(channel_id);
+    } catch (err) {
+      return res.status(200).json({ text: 'Error Deleting Scheduled Message' });
+    }
+    try {
       await reminders.setReminder({
         ...req.body,
         city: userExist.dataValues.city,
-        slack_id: req.body.user_id,
+        slack_id,
+        fiqah,
       });
-
-      return {
-        status: true,
-        message: `You have now subscribed for Fiqah *${req.body.text
-          .toUpperCase()
-          .trim()}*`,
-      };
+    } catch (err) {
+      return res.status(200).json({ text: 'Error Setting reminder' });
     }
-    return { status: false, message: 'Internal Error' };
+  } catch (err) {
+    return res.status(200).json({ text: 'Error fetching user' });
   }
-  return { status: false, message: 'User Does not exist' };
-};
-const updateCity = async (req) => {
-  const userExist = await findOneUser(req.body.user_id);
-  if (userExist) {
-    if (userExist.dataValues.city === req.body.city)
-      return { status: false, message: 'Your current city is also same' };
-    const isUpdated = await user.update(
+  try {
+    await user.update(
       {
-        city: req.body.city,
+        fiqah,
       },
       {
         where: {
-          slack_id: req.body.user_id,
+          slack_id,
         },
       },
     );
-    if (isUpdated) {
-      const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
-      const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+  } catch (err) {
+    return res.status(200).json({ text: 'Error fetching user' });
+  }
 
-      deleteScheduledMessage(userExist.dataValues.channel_id);
+  return res.status(200).json({
+    text: `You have now subscribed for Fiqah *${fiqah.toUpperCase()}*`,
+  });
+};
 
+const updateCity = async (req, res, _next) => {
+  if (!req.body.text || !req.body.user_id)
+    return res.status(200).json({ text: 'Invalid Input!' });
+
+  const city = req.body.text.trim();
+  const slack_id = req.body.user_id;
+
+  const details = cityValidator(city);
+  if (!details.status)
+    return res.status(200).json({
+      text: details.message,
+    });
+
+  try {
+    const userExist = await findOneUser(slack_id);
+    if (!userExist)
+      return res.status(200).json({ text: 'You have not Subscribed!' });
+    if (userExist.dataValues.city === city)
+      return res
+        .status(200)
+        .json({ text: 'You have already subscribed for same city!' });
+
+    const { channel_id } = userExist.dataValues;
+
+    try {
       await savePrayerData.getSaveDataForSingleUser(
-        req.body.city,
+        city,
         userExist.dataValues.fiqah,
       );
-
+    } catch (err) {
+      return res.status(200).json({ text: 'Error Saving Data for city' });
+    }
+    try {
+      deleteScheduledMessage(channel_id);
+    } catch (err) {
+      return res.status(200).json({ text: 'Error Deleting Scheduled Message' });
+    }
+    try {
       await reminders.setReminder({
         ...req.body,
         fiqah: userExist.dataValues.fiqah,
-        slack_id: req.body.user_id,
+        slack_id,
+        city,
       });
-      return {
-        status: true,
-        message: `You have now subscribed for *${req.body.text
-          .toUpperCase()
-          .trim()}*`,
-      };
+    } catch (err) {
+      return res.status(200).json({ text: 'Error Setting reminder' });
     }
-    return { status: false, message: 'Internal Error' };
+  } catch (err) {
+    return res.status(200).json({ text: 'Error fetching user' });
+  }
+  try {
+    await user.update(
+      {
+        city,
+      },
+      {
+        where: {
+          slack_id,
+        },
+      },
+    );
+  } catch (err) {
+    return res.status(200).json({ text: 'Error fetching user' });
   }
 
-  return { status: true, message: 'User Does not exist' };
+  return res.status(200).json({
+    text: `You have now subscribed for City *${city.toUpperCase()}*`,
+  });
 };
+
 module.exports = {
   addUser,
-  findOneUser,
   deleteUser,
   updateFiqah,
   updateCity,

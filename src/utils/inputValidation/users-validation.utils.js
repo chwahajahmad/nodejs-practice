@@ -1,11 +1,14 @@
 const WorldCities = require('worldcities');
 const cityValidator = (city) => {
-  city = city.trim();
-  if (WorldCities.getByName(city) === undefined)
+  if (!city) throw new Error('City Missing');
+  const citydata = WorldCities.getByName(city.trim().toLowerCase());
+  if (citydata === undefined) {
     return {
       status: false,
       message: 'City Not Found',
     };
+  }
+
   return {
     status: true,
     message: 'All Good!',
@@ -13,6 +16,7 @@ const cityValidator = (city) => {
 };
 
 const fiqahValidator = (fiqah) => {
+  if (!fiqah) throw new Error('Fiqah Missing');
   fiqah = fiqah.trim();
   if (!(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi'))
     return {
@@ -27,6 +31,7 @@ const fiqahValidator = (fiqah) => {
 };
 const VerifyRequest = (text) => {
   if (
+    !text ||
     text.length <= 0 ||
     text.indexOf('--') === -1 ||
     text.indexOf('--') === text.lastIndexOf('--')

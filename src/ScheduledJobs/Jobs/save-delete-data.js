@@ -1,15 +1,16 @@
 const axios = require('axios');
-const prayerTimeController = require('../../controller/prayerTime.controller');
+const { addPrayerTime } = require('../../services/prayerTime.services');
+const {
+  findPrayerTimeByCityAndFiqah,
+  deleteAll,
+} = require('../../utils/prayerTime.utils');
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
 const user = require('../../models/users.models');
 
 const getSaveDataForSingleUser = async (city, fiqah) => {
   if (!city || !fiqah) throw new Error('City or Fiqah is Missing');
   try {
-    const res = await prayerTimeController.findPrayerTimeByCityAndFiqah(
-      city,
-      fiqah,
-    );
+    const res = await findPrayerTimeByCityAndFiqah(city, fiqah);
     if (res.length > 0) return;
   } catch (err) {
     throw new Error('Error fetching Prayer Times Data');
@@ -25,12 +26,10 @@ const getSaveDataForSingleUser = async (city, fiqah) => {
   if (weeklyData.length <= 0) return;
 
   try {
-    await prayerTimeController.addPrayerTime({
-      body: {
-        city: city.toLowerCase(),
-        fiqah: fiqah.toLowerCase(),
-        data: weeklyData.data.results,
-      },
+    await addPrayerTime({
+      city: city.toLowerCase(),
+      fiqah: fiqah.toLowerCase(),
+      data: weeklyData.data.results,
     });
   } catch (err) {
     throw new Error(err);
@@ -47,7 +46,7 @@ const getSaveData = async () => {
 };
 
 const deleteAllData = async () => {
-  await prayerTimeController.deleteAll();
+  await deleteAll();
 };
 
 module.exports = { getSaveDataForSingleUser, deleteAllData, getSaveData };
