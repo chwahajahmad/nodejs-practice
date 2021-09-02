@@ -14,14 +14,15 @@ const getSaveDataForSingleUser = async (city, fiqah) => {
     const weeklyData = await axios.get(
       `${apiEndPoint}city=${city}&school=${school}`,
     );
-
-    await prayerTimeController.addPrayerTime({
-      body: {
-        city: city.toLowerCase(),
-        fiqah: fiqah.toLowerCase(),
-        data: weeklyData.data.results,
-      },
-    });
+    if (weeklyData.length > 0) {
+      await prayerTimeController.addPrayerTime({
+        body: {
+          city: city.toLowerCase(),
+          fiqah: fiqah.toLowerCase(),
+          data: weeklyData.data.results,
+        },
+      });
+    }
   }
 };
 
