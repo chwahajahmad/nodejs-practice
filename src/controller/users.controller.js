@@ -1,12 +1,16 @@
 const user = require('../models/users.models');
 const { deleteScheduledMessage } = require('../ScheduledJobs/Jobs/slackTasks');
 
-const addUser = async (req) => {
+const addUser = async (req, res) => {
+  // Wrap in try Catch with multiple catch blocks
+  try{
   const { user_id, fiqah, city, user_name, channel_id } = req.body;
   const userExists = await findOneUser(user_id);
 
-  if (userExists) return { status: false, message: 'User Already Exists' };
+  // Avoid having nested if or large if blocks
+  if (!userExists) throw new Error('User Already Exists');
 
+  
   const userData = await user.create({
     slack_id: user_id,
     fiqah,
@@ -14,22 +18,34 @@ const addUser = async (req) => {
     name: user_name,
     channel_id,
   });
-  if (userData) {
-    const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
-    const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 
-    await savePrayerData.getSaveDataForSingleUser(city, fiqah);
-    await reminders.setReminder({ ...req.body, slack_id: user_id });
+  if (!userData) 
+    return res.status(501).json({ status: false, message: 'Internal Error' });
+  // DB oberations should be in models.
+  // Call those opertions in Controllers. 
+  // Controller is interacting with either a interface or a user
 
-    return { status: true, message: 'Request Successful' };
-  }
-  return { status: false, message: 'Internal Error' };
+  const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
+  const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+
+  await savePrayerData.getSaveDataForSingleUser(city, fiqah);
+  await reminders.setReminder({ ...req.body, slack_id: user_id });
+
+  return res.status(200).json({ status: true, message: 'Request Successful', });
+  
+}catch(err UserAlreadyExists) {
+  // Always send Responses
+  res.send(401).json('User already Exists');
+}catch (err MissingField){
+
 };
 
+// functions not interaction directly with interface or user should be in helpers/utils
+// event, events should trigger from services or events. 
 const updateChannel = async (channel_id, slack_id) => {
   return await user.update(
     {
-      channel_id,
+      channel_id, 
     },
     {
       where: {

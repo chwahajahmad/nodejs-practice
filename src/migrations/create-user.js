@@ -23,6 +23,8 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      // are these needed to be defined manually or are these generated automatically.
+      // CreatedAt and UpdatedAt. 
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
