@@ -73,6 +73,7 @@ const blockData = {
     },
   ],
 };
+
 router.post('/', (req, res) => {
   if (req.body.command === '/helpforprayertimes') {
     res.status(200).json(blockData);
