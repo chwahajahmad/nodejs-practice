@@ -1,8 +1,8 @@
 const axios = require('axios');
-const { addPrayerTime } = require('../../services/prayerTime.services');
 const {
   findPrayerTimeByCityAndFiqah,
   deleteAll,
+  addPrayerTime,
 } = require('../../utils/prayerTime.utils');
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
 const user = require('../../models/users.models');

@@ -17,8 +17,16 @@ const deleteAll = () => {
   return prayerTime.destroy({ truncate: true });
 };
 
+const addPrayerTime = (weeklyData) => {
+  if (!weeklyData.city || !weeklyData.fiqah || !weeklyData.data)
+    throw new Error('No Data To Add');
+  const newPrayerTime = new prayerTime(weeklyData);
+  return newPrayerTime.save();
+};
+
 module.exports = {
   findPrayerTime,
   findPrayerTimeByCityAndFiqah,
   deleteAll,
+  addPrayerTime,
 };

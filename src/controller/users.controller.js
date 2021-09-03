@@ -8,37 +8,34 @@ const {
 } = require('../utils/inputValidation/users-validation.utils');
 const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
 const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
+const sendRes = require('../utils/resSender');
+const { errMsgs, sucMsgs } = require('../utils/constants/responseMessages');
 
 const addUser = async (req, res, _next) => {
   if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
-    return res.status(200).json({ text: 'Missing Necessary data' });
+    return sendRes(res, errMsgs.INTERNAL_ERR.msg);
 
   if (req.body.channel_name !== 'directmessage')
-    return res.status(200).json({
-      text: 'Unable to process your request. \n Please send this command in direct message with Slack Prayer Bot App.',
-    });
+    return sendRes(res, errMsgs.SUB_INVALID_LOC.msg);
 
   const params = VerifyRequest(req.body.text);
 
-  if (!params.status) return res.status(200).json({ text: params.message });
+  if (!params.status) return sendRes(res, params.message);
 
   const { city, fiqah } = params;
   const { user_id, user_name, channel_id } = req.body;
 
   try {
     const userExists = await findOneUser(user_id);
-    if (userExists)
-      return res.status(200).json({ text: 'User Already Exists' });
+    if (userExists) return sendRes(res, errMsgs.USER_EXIST.msg);
   } catch (err) {
-    return res.status(200).json({ text: 'Error Fetching User Data' });
+    return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
   }
 
   try {
     await savePrayerData.getSaveDataForSingleUser(city, fiqah);
   } catch (err) {
-    return res
-      .status(200)
-      .json({ text: 'Error Getting/Saving Prayer Data(City not Found)' });
+    return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
   }
 
   try {
@@ -49,9 +46,9 @@ const addUser = async (req, res, _next) => {
       name: user_name,
       channel_id,
     });
-    if (!userData) return res.status(200).json({ text: 'Error Creating User' });
+    if (!userData) return sendRes(res, errMsgs.CREATING_USER.msg);
   } catch (err) {
-    return res.status(200).json({ text: 'Internal Error(User Creation)' });
+    return sendRes(res, errMsgs.INTERNAL_ERR.msg);
   }
 
   try {
@@ -62,26 +59,26 @@ const addUser = async (req, res, _next) => {
       slack_id: user_id,
     });
   } catch (err) {
-    return res.status(200).json({ text: 'Error Setting Reminder' });
+    return sendRes(res, errMsgs.REMINDER_SET.msg);
   }
 
-  return res.status(200).json({ text: 'You have subscribed Successfully' });
+  return sendRes(res, sucMsgs.USER_SUB.msg);
 };
 
 const deleteUser = async (req, res, _next) => {
   if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
-    return res.status(200).json({ text: 'Missing Necessary data' });
+    return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   const { user_id: slack_id } = req.body;
 
   const userExist = await findOneUser(slack_id);
 
-  if (!userExist) return res.status(200).json({ text: 'User Does not Exist!' });
+  if (!userExist) return sendRes(res, errMsgs.USER_NOT_EXIST.msg);
 
   try {
     deleteScheduledMessage(userExist.dataValues.channel_id);
   } catch (err) {
-    return res.status(200).json({ text: 'Error Deleting Scheduled Messages!' });
+    return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
   }
 
   try {
@@ -91,17 +88,15 @@ const deleteUser = async (req, res, _next) => {
       },
     });
   } catch (err) {
-    res.status(200).json({ text: 'Error Deleting User!' });
+    return sendRes(res, errMsgs.DELETE_USER);
   }
 
-  return res
-    .status(200)
-    .json({ text: 'You will not receive reminders anymore!' });
+  return sendRes(res, sucMsgs.DELETE_USER.msg);
 };
 
 const updateFiqah = async (req, res, _next) => {
   if (!req.body.text || !req.body.user_id)
-    return res.status(200).json({ text: 'Invalid Input!' });
+    return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   const fiqah = req.body.text.trim();
   const slack_id = req.body.user_id;
@@ -114,12 +109,9 @@ const updateFiqah = async (req, res, _next) => {
 
   try {
     const userExist = await findOneUser(slack_id);
-    if (!userExist)
-      return res.status(200).json({ text: 'You have not Subscribed!' });
+    if (!userExist) return sendRes(res, errMsgs.USER_NOT_EXIST.msg);
     if (userExist.dataValues.fiqah === fiqah)
-      return res
-        .status(200)
-        .json({ text: 'You have already subscribed for same fiqah!' });
+      return sendRes(res, errMsgs.SAME_FIQAH.msg);
 
     const { channel_id } = userExist.dataValues;
 
@@ -129,12 +121,12 @@ const updateFiqah = async (req, res, _next) => {
         fiqah,
       );
     } catch (err) {
-      return res.status(200).json({ text: 'Error Saving Data for city' });
+      return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
     }
     try {
       deleteScheduledMessage(channel_id);
     } catch (err) {
-      return res.status(200).json({ text: 'Error Deleting Scheduled Message' });
+      return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
     }
     try {
       await reminders.setReminder({
@@ -144,10 +136,10 @@ const updateFiqah = async (req, res, _next) => {
         fiqah,
       });
     } catch (err) {
-      return res.status(200).json({ text: 'Error Setting reminder' });
+      return sendRes(res, errMsgs.REMINDER_SET.msg);
     }
   } catch (err) {
-    return res.status(200).json({ text: 'Error fetching user' });
+    return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
   }
   try {
     await user.update(
@@ -161,35 +153,27 @@ const updateFiqah = async (req, res, _next) => {
       },
     );
   } catch (err) {
-    return res.status(200).json({ text: 'Error fetching user' });
+    return sendRes(res, errMsgs.UPDATE_USER.msg);
   }
 
-  return res.status(200).json({
-    text: `You have now subscribed for Fiqah *${fiqah.toUpperCase()}*`,
-  });
+  return sendRes(res, sucMsgs.FIQAH_UPDATE.msg);
 };
 
 const updateCity = async (req, res, _next) => {
   if (!req.body.text || !req.body.user_id)
-    return res.status(200).json({ text: 'Invalid Input!' });
+    return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   const city = req.body.text.trim();
   const slack_id = req.body.user_id;
 
   const details = cityValidator(city);
-  if (!details.status)
-    return res.status(200).json({
-      text: details.message,
-    });
+  if (!details.status) return sendRes(res, details.message);
 
   try {
     const userExist = await findOneUser(slack_id);
-    if (!userExist)
-      return res.status(200).json({ text: 'You have not Subscribed!' });
+    if (!userExist) return sendRes(res, errMsgs.USER_NOT_EXIST.msg);
     if (userExist.dataValues.city === city)
-      return res
-        .status(200)
-        .json({ text: 'You have already subscribed for same city!' });
+      return sendRes(res, errMsgs.SAME_CITY.msg);
 
     const { channel_id } = userExist.dataValues;
 
@@ -199,12 +183,12 @@ const updateCity = async (req, res, _next) => {
         userExist.dataValues.fiqah,
       );
     } catch (err) {
-      return res.status(200).json({ text: 'Error Saving Data for city' });
+      return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
     }
     try {
       deleteScheduledMessage(channel_id);
     } catch (err) {
-      return res.status(200).json({ text: 'Error Deleting Scheduled Message' });
+      return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
     }
     try {
       await reminders.setReminder({
@@ -214,10 +198,10 @@ const updateCity = async (req, res, _next) => {
         city,
       });
     } catch (err) {
-      return res.status(200).json({ text: 'Error Setting reminder' });
+      return sendRes(res, errMsgs.REMINDER_SET.msg);
     }
   } catch (err) {
-    return res.status(200).json({ text: 'Error fetching user' });
+    return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
   }
   try {
     await user.update(
@@ -231,12 +215,10 @@ const updateCity = async (req, res, _next) => {
       },
     );
   } catch (err) {
-    return res.status(200).json({ text: 'Error fetching user' });
+    return sendRes(res, errMsgs.UPDATE_USER.msg);
   }
 
-  return res.status(200).json({
-    text: `You have now subscribed for City *${city.toUpperCase()}*`,
-  });
+  return sendRes(res, sucMsgs.CITY_UPDATE.msg);
 };
 
 module.exports = {
