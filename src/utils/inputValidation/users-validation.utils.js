@@ -1,20 +1,3 @@
-const WorldCities = require('worldcities');
-const cityValidator = (city) => {
-  if (!city) throw new Error('City Missing');
-  const citydata = WorldCities.getByName(city.trim().toLowerCase());
-  if (citydata === undefined) {
-    return {
-      status: false,
-      message: 'City Not Found',
-    };
-  }
-
-  return {
-    status: true,
-    message: 'All Good!',
-  };
-};
-
 const fiqahValidator = (fiqah) => {
   if (!fiqah) throw new Error('Fiqah Missing');
   fiqah = fiqah.trim();
@@ -29,7 +12,7 @@ const fiqahValidator = (fiqah) => {
     message: 'All Good!',
   };
 };
-const VerifyRequest = (text) => {
+const cityFiqahSeperator = (text) => {
   if (
     !text ||
     text.length <= 0 ||
@@ -51,12 +34,9 @@ const VerifyRequest = (text) => {
   const fiqah = text.slice(text.lastIndexOf('--') + 2, text.length);
 
   const fiqahValidation = fiqahValidator(fiqah);
-  const cityValidation = cityValidator(city);
 
   if (!fiqahValidation.status) return fiqahValidation;
-  if (!cityValidation.status) return cityValidation;
-
   return { status: true, city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
 };
 
-module.exports = { VerifyRequest, cityValidator, fiqahValidator };
+module.exports = { cityFiqahSeperator, fiqahValidator };

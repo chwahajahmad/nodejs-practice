@@ -2,23 +2,23 @@ const user = require('../models/users.models');
 const { deleteScheduledMessage } = require('../services/slackTasks');
 const { findOneUser } = require('../utils/users.utils');
 const {
-  VerifyRequest,
+  cityFiqahSeperator,
   fiqahValidator,
-  cityValidator,
 } = require('../utils/inputValidation/users-validation.utils');
 const savePrayerData = require('../ScheduledJobs/Jobs/save-delete-data');
 const reminders = require('../ScheduledJobs/Jobs/dailyReminders');
 const sendRes = require('../utils/resSender');
 const { errMsgs, sucMsgs } = require('../utils/constants/responseMessages');
+const userSchema = require('../utils/inputValidation/userJoi');
 
 const addUser = async (req, res, _next) => {
-  if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
-    return sendRes(res, errMsgs.INTERNAL_ERR.msg);
+  const result = userSchema.validate(req.body);
+  if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   if (req.body.channel_name !== 'directmessage')
     return sendRes(res, errMsgs.SUB_INVALID_LOC.msg);
 
-  const params = VerifyRequest(req.body.text);
+  const params = cityFiqahSeperator(req.body.text);
 
   if (!params.status) return sendRes(res, params.message);
 
@@ -66,8 +66,8 @@ const addUser = async (req, res, _next) => {
 };
 
 const deleteUser = async (req, res, _next) => {
-  if (!req.body.channel_name || !req.body.user_id || !req.body.user_name)
-    return sendRes(res, errMsgs.INVALID_REQ.msg);
+  const result = userSchema.validate(req.body);
+  if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   const { user_id: slack_id } = req.body;
 
@@ -95,8 +95,8 @@ const deleteUser = async (req, res, _next) => {
 };
 
 const updateFiqah = async (req, res, _next) => {
-  if (!req.body.text || !req.body.user_id)
-    return sendRes(res, errMsgs.INVALID_REQ.msg);
+  const result = userSchema.validate(req.body);
+  if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   const fiqah = req.body.text.trim();
   const slack_id = req.body.user_id;
@@ -160,14 +160,11 @@ const updateFiqah = async (req, res, _next) => {
 };
 
 const updateCity = async (req, res, _next) => {
-  if (!req.body.text || !req.body.user_id)
-    return sendRes(res, errMsgs.INVALID_REQ.msg);
+  const result = userSchema.validate(req.body);
+  if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
   const city = req.body.text.trim();
   const slack_id = req.body.user_id;
-
-  const details = cityValidator(city);
-  if (!details.status) return sendRes(res, details.message);
 
   try {
     const userExist = await findOneUser(slack_id);
