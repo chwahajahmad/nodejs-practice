@@ -36,10 +36,10 @@ const setReminder = async (data) => {
 };
 const setReminderForAll = async () => {
   try {
-    const userData = await user.findAllUsers();
+    const userData = await user.findAll();
 
+    console.log('Here Posting Reminders');
     userData.forEach((data) => {
-      console.log('Here Posting Reminders');
       setReminder(data.dataValues);
     });
   } catch (err) {
