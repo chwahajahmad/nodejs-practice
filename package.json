@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"src/**\"",
     "format": "prettier --write \"src/**/*.js\"",
-    "build":"tsc"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/chwahajahmad/nodejs-practice#readme",
   "dependencies": {
     "@slack/web-api": "^6.4.0",
+    "await-to-js": "^3.0.0",
     "axios": "^0.21.1",
     "cors": "^2.8.5",
     "dayjs": "^1.10.6",
