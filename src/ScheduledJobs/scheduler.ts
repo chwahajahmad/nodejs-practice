@@ -10,7 +10,7 @@ const weeklyDataGetterScheduler = schedule.scheduleJob('02 00 * * */7', () => {
   timezone:'Asia/Karachi'
 });
 
-const dailyReminderScheduler = schedule.scheduleJob('11 00 1-31 */1 *', () => {
+const dailyReminderScheduler = schedule.scheduleJob('16 00 1-31 */1 *', () => {
   setReminderForAll();
 },{
   timezone:'Asia/Karachi'
