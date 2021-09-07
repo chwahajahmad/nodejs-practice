@@ -30,6 +30,7 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
     const message = `Its ${namazName} Time`;
     
     const timeStamp = dayjs.tz(`${date} ${time}`,timezone).unix();
+    console.log("Server data:",dayjs().unix());
     console.log("came here", timeStamp,timeStampNow)
     if (timeStampNow < timeStamp) {
       try {
