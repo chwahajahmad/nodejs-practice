@@ -38,6 +38,11 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
     weeklyDataOperations.getSaveDataForSingleUser(city, fiqah),
   );
   if (errSaveData) return sendRes(response_url, errMsgs.FETCH_CITY_DATA.msg);
+  const [errReminder] = await to(
+    dailyReminders.setReminder(city, fiqah, user_id),
+  );
+  if (errReminder) return sendRes(response_url, errReminder.message);
+
   const [errUserCreate, userCreate] = await to(
     users.create({
       slack_id: user_id,
@@ -50,11 +55,7 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   if (!userCreate) return sendRes(response_url, errMsgs.CREATING_USER.msg);
   if (errUserCreate) return sendRes(response_url, errMsgs.INTERNAL_ERR.msg);
 
-  const [errReminder] = await to(
-    dailyReminders.setReminder(city, fiqah, user_id),
-  );
-  if (errReminder) return sendRes(response_url, errMsgs.REMINDER_SET.msg);
-
+ 
   return sendRes(response_url, sucMsgs.USER_SUB.msg);
 };
 const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {

@@ -15,10 +15,6 @@ const { to } = require('await-to-js');
 
 const setReminder = async (city: string, fiqah: string, channel: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah Missing');
-  const [errSchMsg,dataSchMsg] = await to (getScheduledMessages(channel));
-  if(errSchMsg) throw new Error('Error Finding Scheduled Message');
-  if(dataSchMsg) return;
-  
   const [err,res] = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
   if(err) throw new Error('Error Finding Prayer Data');
   if (res.length <= 0) return;
