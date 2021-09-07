@@ -8,11 +8,15 @@ const fiqahValidator = (fiqah: string) => {
     return {
       status: false,
       message: 'Fiqah Should Be Hanafi or Jafari',
+      city: '',
+      fiqah: '',
     };
 
   return {
     status: true,
     message: 'All Good!',
+    city: '',
+    fiqah: '',
   };
 };
 
@@ -26,6 +30,8 @@ const cityFiqahSeperator = (text: string) => {
     return {
       status: false,
       message: 'Make Sure You have added City and Fiqah',
+      city: '',
+      fiqah: '',
     };
 
   const city = text.slice(
@@ -40,10 +46,15 @@ const cityFiqahSeperator = (text: string) => {
   const fiqahValidation = fiqahValidator(fiqah);
 
   if (!fiqahValidation.status) return fiqahValidation;
-  return { status: true, city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
+  return {
+    status: true,
+    message: 'Successfully Return',
+    city: city.toLowerCase(),
+    fiqah: fiqah.toLowerCase(),
+  };
 };
 
-const userSchema = (omitText: string) =>
+const userSchema = (omitText: boolean) =>
   Joi.object()
     .keys({
       command: Joi.string().required(),
@@ -56,4 +67,4 @@ const userSchema = (omitText: string) =>
     })
     .unknown(true);
 
-module.exports = { cityFiqahSeperator, fiqahValidator, userSchema };
+export { cityFiqahSeperator, fiqahValidator, userSchema };

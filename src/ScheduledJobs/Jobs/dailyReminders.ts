@@ -1,5 +1,4 @@
-export {};
-const dayjs = require('dayjs');
+import dayjs from 'dayjs';
 const {
   findPrayerTimeByCityAndFiqah,
 } = require('../../models/prayerTime.models');
@@ -44,7 +43,4 @@ const setReminderForAll = async () => {
     setReminder(city, fiqah, slack_id);
   });
 };
-module.exports = {
-  setReminder,
-  setReminderForAll,
-};
+export { setReminder, setReminderForAll };

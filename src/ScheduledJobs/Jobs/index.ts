@@ -1,5 +1,5 @@
-const dailyReminders = require('./dailyReminders');
+import * as dailyReminders from './dailyReminders';
 
-const weeklyDataOperations = require('./save-delete-data');
+import * as weeklyDataOperations from './save-delete-data';
 
-module.exports = { ...dailyReminders, ...weeklyDataOperations };
+export { dailyReminders, weeklyDataOperations };

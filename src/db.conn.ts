@@ -1,6 +1,5 @@
-export {};
 const Sequelize = require('sequelize');
-const config = require('./config/config.json');
+import config from './config/config.json';
 
 let databaseUrl,
   creds = config['development'];
@@ -19,4 +18,4 @@ postgresConn
     console.error('Unable to connect to the database:', err);
   });
 
-module.exports = postgresConn;
+export default postgresConn;

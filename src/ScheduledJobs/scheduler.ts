@@ -1,7 +1,8 @@
-export { }
+export {};
 const schedule = require('node-schedule');
 const { getSaveData, deleteAllData } = require('./Jobs/save-delete-data');
 const { setReminderForAll } = require('./Jobs/dailyReminders');
+
 module.exports.weeklyDataGetterScheduler = schedule.scheduleJob(
   '02 00 * * */7',
   () => {

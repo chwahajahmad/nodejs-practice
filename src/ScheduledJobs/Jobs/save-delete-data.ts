@@ -1,24 +1,23 @@
-export {};
-const axios = require('axios');
-const {
+import axios from 'axios';
+import {
   findPrayerTimeByCityAndFiqah,
-  deleteAll,
+  deleteAllPrayerTimes,
   addPrayerTime,
-} = require('../../models/prayerTime.models');
+} from '../../models/prayerTime.models';
+import { users } from '../../models/users.models';
+import { to } from 'await-to-js';
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
-const { users } = require('../../models/users.models');
-const { to } = require('await-to-js');
 const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah is Missing');
 
-  const [err, res] = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
+  const [err, res]: any = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
   if (res.length > 0) return;
   if (err) throw new Error('Error fetching Prayer Times Data');
 
   let school;
   fiqah.toLowerCase() === 'jafari' ? (school = 0) : (school = 1);
 
-  const weeklyData = await axios.get(
+  const weeklyData: any = await axios.get(
     `${apiEndPoint}city=${city}&school=${school}`,
   );
 
@@ -35,7 +34,7 @@ const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
 };
 
 const getSaveData = async () => {
-  const [err, userData] = await to(users.findAll());
+  const [err, userData]: any = await to(users.findAll());
   if (err) throw new Error('Error Fetching User Data');
   userData.forEach((data: any) => {
     const { city, fiqah } = data.dataValues;
@@ -44,7 +43,8 @@ const getSaveData = async () => {
 };
 
 const deleteAllData = async () => {
-  await deleteAll();
+  const [err] = await to(deleteAllPrayerTimes());
+  if (err) throw Error('Error Deleting Prayer Times');
 };
 
-module.exports = { getSaveDataForSingleUser, deleteAllData, getSaveData };
+export { getSaveDataForSingleUser, deleteAllData, getSaveData };

@@ -1,6 +1,6 @@
-export {};
-const { Sequelize, DataTypes } = require('sequelize');
-const db = require('../db.conn');
+const { Sequelize } = require('sequelize');
+import { DataTypes } from 'sequelize';
+import db from '../db.conn';
 
 const weekly_prayer_data = db.define(
   'weekly_prayer_data',
@@ -57,7 +57,7 @@ const addPrayerTime = (weeklyData: {
   return newPrayerTime.save();
 };
 
-module.exports = {
+export {
   findPrayerTime,
   findPrayerTimeByCityAndFiqah,
   deleteAllPrayerTimes,

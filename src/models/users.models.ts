@@ -1,6 +1,6 @@
 export {};
-const { DataTypes } = require('sequelize');
-const db = require('../db.conn');
+import { DataTypes } from 'sequelize';
+import db from '../db.conn';
 
 const users = db.define(
   'users',
@@ -39,4 +39,4 @@ const findOneUser = (id: string) => {
     },
   });
 };
-module.exports = { users, findOneUser };
+export { users, findOneUser };

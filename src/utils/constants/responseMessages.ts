@@ -1,4 +1,3 @@
-export { }
 const sucMsgs = {
   USER_SUB: { stats: 200, msg: 'User Subscribed Successfully!' },
   CITY_UPDATE: { stats: 200, msg: 'City Updated Successfully!' },
@@ -64,4 +63,4 @@ const errMsgs = {
   },
 };
 
-module.exports = { sucMsgs, errMsgs };
+export { sucMsgs, errMsgs };

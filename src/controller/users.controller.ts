@@ -1,18 +1,17 @@
-export {};
-const { users, findOneUser } = require('../models/users.models');
-const { deleteScheduledMessage } = require('../services/slackTasks');
-const {
+import { users, findOneUser } from '../models/users.models';
+import { deleteScheduledMessage } from '../services/slackTasks';
+import {
   cityFiqahSeperator,
   fiqahValidator,
   userSchema,
-} = require('../utils/inputValidation/users-validation.utils');
-const {
-  getSaveDataForSingleUser,
-  setReminder,
-} = require('../ScheduledJobs/Jobs/index');
-const { sendRes } = require('../utils/resSender');
-const { errMsgs, sucMsgs } = require('../utils/constants/responseMessages');
-const { to } = require('await-to-js');
+} from '../utils/inputValidation/users-validation.utils';
+import {
+  dailyReminders,
+  weeklyDataOperations,
+} from '../ScheduledJobs/Jobs/index';
+import { sendRes } from '../utils/resSender';
+import { errMsgs, sucMsgs } from '../utils/constants/responseMessages';
+import { to } from 'await-to-js';
 import { Request, Response, NextFunction } from 'express';
 
 const addUser = async (req: Request, res: Response, _next: NextFunction) => {
@@ -33,7 +32,9 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   if (userData) return sendRes(res, errMsgs.USER_EXIST.msg);
   if (errUserData) return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
 
-  const [errSaveData] = await to(getSaveDataForSingleUser(city, fiqah));
+  const [errSaveData] = await to(
+    weeklyDataOperations.getSaveDataForSingleUser(city, fiqah),
+  );
   if (errSaveData) return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
   const [errUserCreate, userCreate] = await to(
     users.create({
@@ -47,7 +48,9 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   if (!userCreate) return sendRes(res, errMsgs.CREATING_USER.msg);
   if (errUserCreate) return sendRes(res, errMsgs.INTERNAL_ERR.msg);
 
-  const [errReminder] = await to(setReminder(city, fiqah, user_id));
+  const [errReminder] = await to(
+    dailyReminders.setReminder(city, fiqah, user_id),
+  );
   if (errReminder) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
   return sendRes(res, sucMsgs.USER_SUB.msg);
@@ -58,7 +61,7 @@ const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
 
   const { user_id: slack_id } = req.body;
 
-  const [errFetchingUser, userExist] = await to(findOneUser(slack_id));
+  const [errFetchingUser, userExist]: any = await to(findOneUser(slack_id));
 
   if (errFetchingUser) return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
   if (!userExist) return sendRes(res, errMsgs.USER_NOT_EXIST.msg);
@@ -69,7 +72,7 @@ const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
   if (errScheduleMsg) return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
 
   const [errDestroy] = await to(users.destroy({ where: { slack_id } }));
-  if (errDestroy) return sendRes(res, errMsgs.DELETE_USER);
+  if (errDestroy) return sendRes(res, errMsgs.DELETE_USER.msg);
 
   return sendRes(res, sucMsgs.DELETE_USER.msg);
 };
@@ -90,7 +93,7 @@ const updateFiqah = async (
       text: details.message,
     });
 
-  const [userFetchError, userExist] = await to(findOneUser(slack_id));
+  const [userFetchError, userExist]: any = await to(findOneUser(slack_id));
   if (userFetchError) return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
   if (!userExist) return sendRes(res, errMsgs.USER_NOT_EXIST.msg);
 
@@ -103,12 +106,15 @@ const updateFiqah = async (
   if (errDeleteMsg) return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
 
   const [saveDataErr] = await to(
-    getSaveDataForSingleUser(userExist.dataValues.city, fiqah),
+    weeklyDataOperations.getSaveDataForSingleUser(
+      userExist.dataValues.city,
+      fiqah,
+    ),
   );
   if (saveDataErr) return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
 
   const [errSetReminder] = await to(
-    setReminder(userExist.dataValues.city, fiqah, slack_id),
+    dailyReminders.setReminder(userExist.dataValues.city, fiqah, slack_id),
   );
   if (errSetReminder) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
@@ -126,7 +132,7 @@ const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
   const city = req.body.text.trim();
   const slack_id = req.body.user_id;
 
-  const [userFetchErr, userExist] = await to(findOneUser(slack_id));
+  const [userFetchErr, userExist]: any = await to(findOneUser(slack_id));
   if (!userExist) return sendRes(res, errMsgs.USER_NOT_EXIST.msg);
   if (userFetchErr) return sendRes(res, errMsgs.FETCH_USER_DATA.msg);
 
@@ -135,7 +141,10 @@ const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
   const { channel_id } = userExist.dataValues;
 
   const [saveDataErr] = await to(
-    getSaveDataForSingleUser(city, userExist.dataValues.fiqah),
+    weeklyDataOperations.getSaveDataForSingleUser(
+      city,
+      userExist.dataValues.fiqah,
+    ),
   );
   if (saveDataErr) return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
 
@@ -143,7 +152,7 @@ const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
   if (deleteErr) return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
 
   const [reminderErr] = await to(
-    setReminder(city, userExist.dataValues.fiqah, slack_id),
+    dailyReminders.setReminder(city, userExist.dataValues.fiqah, slack_id),
   );
   if (reminderErr) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
@@ -153,9 +162,4 @@ const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
   return sendRes(res, sucMsgs.CITY_UPDATE.msg);
 };
 
-module.exports = {
-  addUser,
-  deleteUser,
-  updateFiqah,
-  updateCity,
-};
+export { addUser, deleteUser, updateFiqah, updateCity };
