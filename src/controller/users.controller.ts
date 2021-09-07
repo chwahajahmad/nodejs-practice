@@ -15,7 +15,7 @@ import { to } from 'await-to-js';
 import { Request, Response, NextFunction } from 'express';
 
 const addUser = async (req: Request, res: Response, _next: NextFunction) => {
-  res.status(200).send('Working on your request...');
+  res.status(200).json({text:'Working on your request...'});
   const { response_url } = req.body;
   const result = userSchema(false).validate(req.body);
   if (result.error) return sendRes(response_url, errMsgs.INVALID_REQ.msg);
@@ -75,7 +75,7 @@ const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
   const [errScheduleMsg] = await to(
     deleteScheduledMessage(userExist.dataValues.channel_id),
   );
-  if (errScheduleMsg) return sendRes(response_url, errMsgs.DELETE_SCH_MSG.msg);
+  if (errScheduleMsg) return sendRes(response_url, errScheduleMsg.message);
 
   const [errDestroy] = await to(users.destroy({ where: { slack_id } }));
   if (errDestroy) return sendRes(response_url, errMsgs.DELETE_USER.msg);
