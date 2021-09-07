@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
-import {getScheduledMessages} from '../../services/slackTasks'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -30,8 +29,8 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
     const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
     const message = `Its ${namazName} Time`;
     
-    
     const timeStamp = dayjs.tz(`${date} ${time}`,timezone).unix();
+    console.log("came here", timeStamp,timeStampNow)
     if (timeStampNow < timeStamp) {
       try {
         postMessage(message, channel, timeStamp);
