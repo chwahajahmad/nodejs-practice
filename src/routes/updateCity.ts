@@ -1,11 +1,9 @@
-export {};
-const express = require('express');
-const { updateCity } = require('../controller/users.controller');
+import express, { NextFunction, Request, Response } from 'express';
+import { updateCity } from '../controller/users.controller';
 const router = express.Router();
-import { Request, Response } from 'express';
 
-router.post('/', (req: Request, res: Response) => {
-  updateCity(req, res);
+router.post('/', (req: Request, res: Response, next: NextFunction) => {
+  updateCity(req, res, next);
 });
 
-module.exports = router;
+export default router;

@@ -1,7 +1,5 @@
-export {};
-const express = require('express');
+import express, { Request, Response } from 'express';
 const router = express.Router();
-import { Request, Response } from 'express';
 const blockData = {
   blocks: [
     {
@@ -80,4 +78,4 @@ router.post('/', (req: Request, res: Response) => {
     res.status(200).json(blockData);
   }
 });
-module.exports = router;
+export default router;

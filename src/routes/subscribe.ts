@@ -1,12 +1,8 @@
-import e, { request } from 'express';
-
-export {};
-const express = require('express');
-const { addUser } = require('../controller/users.controller');
+import express, { NextFunction, Request, Response } from 'express';
+import { addUser } from '../controller/users.controller';
 const router = express.Router();
-import { Request, Response } from 'express';
 
-router.post('/', (req: Request, res: Response) => {
-  addUser(req, res);
+router.post('/', (req: Request, res: Response, next: NextFunction) => {
+  addUser(req, res, next);
 });
-module.exports = router;
+export default router;

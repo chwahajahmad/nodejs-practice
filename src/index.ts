@@ -1,9 +1,7 @@
-export { };
-const express = require('express');
-const postgre = require('./db.conn');
-const scheduler = require('./ScheduledJobs/scheduler');
-const dailyReminderScheduler = require('./ScheduledJobs/Jobs/dailyReminders');
-const slackRoutes = require('./routes/SlackCrudRoutes');
+import express from 'express';
+import postgre from './db.conn';
+import * as scheduler from './ScheduledJobs/scheduler';
+import slackRoutes from './routes/SlackCrudRoutes';
 const app = express();
 const port = process.env.PORT || 3002;
 

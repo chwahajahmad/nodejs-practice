@@ -1,11 +1,9 @@
-export { };
-const subscribeRoute = require('./subscribe');
-const unsubscribeRoute = require('./unsubscribe');
-const helpRoute = require('./help');
-const updateFiqahRoute = require('./updateFiqah');
-const updateCityRoute = require('./updateCity');
-
-const express = require('express');
+import subscribeRoute from './subscribe';
+import unsubscribeRoute from './unsubscribe';
+import helpRoute from './help';
+import updateFiqahRoute from './updateFiqah';
+import updateCityRoute from './updateCity';
+import express from 'express';
 const router = express.Router();
 
 const routes = () => {
@@ -17,4 +15,4 @@ const routes = () => {
   return router;
 };
 
-module.exports = routes;
+export default routes;

@@ -1,11 +1,9 @@
-export {};
-const express = require('express');
-const { deleteUser } = require('../controller/users.controller');
+import express, { NextFunction, Request, Response } from 'express';
+import { deleteUser } from '../controller/users.controller';
 const router = express.Router();
-import { Request, Response } from 'express';
 
-router.post('/', (req: Request, res: Response) => {
-  deleteUser(req, res);
+router.post('/', (req: Request, res: Response, next: NextFunction) => {
+  deleteUser(req, res, next);
 });
 
-module.exports = router;
+export default router;
