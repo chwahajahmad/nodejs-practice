@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const dayjs = require('dayjs');
-const { findPrayerTimeByCityAndFiqah, } = require('../../utils/prayerTime.utils');
+const { findPrayerTimeByCityAndFiqah, } = require('../../models/prayerTime.models');
 const { postMessage } = require('../../services/slackTasks');
-const user = require('../../models/users.models');
+const { users } = require('../../models/users.models');
 const { to } = require('await-to-js');
 const setReminder = async (city, fiqah, channel) => {
     if (!city || !fiqah)
@@ -30,7 +30,7 @@ const setReminder = async (city, fiqah, channel) => {
     });
 };
 const setReminderForAll = async () => {
-    const [err, userData] = await to(user.findAll());
+    const [err, userData] = await to(users.findAll());
     if (err)
         throw Error(err);
     userData.forEach((data) => {

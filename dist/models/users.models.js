@@ -27,8 +27,17 @@ const users = db.define('users', {
 }, {
     freezeTableName: true,
 });
+const findOneUser = (id) => {
+    if (!id)
+        throw new Error('ID Missing'); //Validation
+    return users.findOne({
+        where: {
+            slack_id: id,
+        },
+    });
+};
 // user
 //   .sync()
 //   .then((res) => console.log(res))
 //   .catch((err) => console.log(err));
-module.exports = users;
+module.exports = { users, findOneUser };

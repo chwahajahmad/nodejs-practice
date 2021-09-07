@@ -1,5 +1,5 @@
 export {};
-const user = require('../models/users.models');
+const { users, findOneUser } = require('../models/users.models');
 const { deleteScheduledMessage } = require('../services/slackTasks');
 const {
   cityFiqahSeperator,
@@ -10,7 +10,7 @@ const {
   getSaveDataForSingleUser,
   setReminder,
 } = require('../ScheduledJobs/Jobs/index');
-const { sendRes, findOneUser } = require('../utils/index');
+const { sendRes } = require('../utils/resSender');
 const { errMsgs, sucMsgs } = require('../utils/constants/responseMessages');
 const { to } = require('await-to-js');
 import { Request, Response, NextFunction } from 'express';
@@ -36,7 +36,7 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   const [errSaveData] = await to(getSaveDataForSingleUser(city, fiqah));
   if (errSaveData) return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
   const [errUserCreate, userCreate] = await to(
-    user.create({
+    users.create({
       slack_id: user_id,
       fiqah,
       city,
@@ -68,7 +68,7 @@ const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
   );
   if (errScheduleMsg) return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
 
-  const [errDestroy] = await to(user.destroy({ where: { slack_id } }));
+  const [errDestroy] = await to(users.destroy({ where: { slack_id } }));
   if (errDestroy) return sendRes(res, errMsgs.DELETE_USER);
 
   return sendRes(res, sucMsgs.DELETE_USER.msg);
@@ -112,7 +112,9 @@ const updateFiqah = async (
   );
   if (errSetReminder) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
-  const [errUpdate] = await to(user.update({ fiqah }, { where: { slack_id } }));
+  const [errUpdate] = await to(
+    users.update({ fiqah }, { where: { slack_id } }),
+  );
   if (errUpdate) return sendRes(res, errMsgs.UPDATE_USER.msg);
 
   return sendRes(res, sucMsgs.FIQAH_UPDATE.msg);
@@ -145,7 +147,7 @@ const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
   );
   if (reminderErr) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
-  const [updateErr] = await to(user.update({ city }, { where: { slack_id } }));
+  const [updateErr] = await to(users.update({ city }, { where: { slack_id } }));
   if (updateErr) return sendRes(res, errMsgs.UPDATE_USER.msg);
 
   return sendRes(res, sucMsgs.CITY_UPDATE.msg);

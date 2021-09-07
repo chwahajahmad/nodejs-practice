@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios = require('axios');
-const { findPrayerTimeByCityAndFiqah, deleteAll, addPrayerTime, } = require('../../utils/prayerTime.utils');
+const { findPrayerTimeByCityAndFiqah, deleteAll, addPrayerTime, } = require('../../models/prayerTime.models');
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
-const user = require('../../models/users.models');
+const { users } = require('../../models/users.models');
 const { to } = require('await-to-js');
 const getSaveDataForSingleUser = async (city, fiqah) => {
     if (!city || !fiqah)
@@ -27,7 +27,7 @@ const getSaveDataForSingleUser = async (city, fiqah) => {
         throw new Error(err);
 };
 const getSaveData = async () => {
-    const [err, userData] = await to(user.findAll());
+    const [err, userData] = await to(users.findAll());
     if (err)
         throw new Error('Error Fetching User Data');
     userData.forEach((data) => {

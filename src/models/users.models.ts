@@ -1,4 +1,4 @@
-export { };
+export {};
 const { DataTypes } = require('sequelize');
 const db = require('../db.conn');
 
@@ -31,8 +31,16 @@ const users = db.define(
     freezeTableName: true,
   },
 );
+const findOneUser = (id: string) => {
+  if (!id) throw new Error('ID Missing'); //Validation
+  return users.findOne({
+    where: {
+      slack_id: id,
+    },
+  });
+};
 // user
 //   .sync()
 //   .then((res) => console.log(res))
 //   .catch((err) => console.log(err));
-module.exports = users;
+module.exports = { users, findOneUser };
