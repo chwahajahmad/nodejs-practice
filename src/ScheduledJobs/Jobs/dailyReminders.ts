@@ -1,4 +1,11 @@
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+
+
 const {
   findPrayerTimeByCityAndFiqah,
 } = require('../../models/prayerTime.models');
@@ -16,15 +23,16 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
   const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
   prayerTimes.forEach((namazName) => {
-    const day = new Date().getDay();
+    const timezone = res[0].dataValues.data.location.timezone;
+    const timeNow = dayjs().format('YYYY-MM-DD HH:mm').toString();
+    const timeStampNow = dayjs.tz(timeNow, timezone).unix();
+    const day = dayjs.tz(timeNow, timezone).day();
     const time = res[0].dataValues.data.datetime[day - 1].times[namazName];
     const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
-
     const message = `Its ${namazName} Time`;
-
-    const timeStamp = dayjs(`${date} ${time}`).unix();
-    const timeStampNow = dayjs().unix();
-
+    
+    
+    const timeStamp = dayjs.tz(`${date} ${time}`,timezone).unix();
     if (timeStampNow < timeStamp) {
       try {
         postMessage(message, channel, timeStamp);
