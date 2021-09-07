@@ -1,5 +1,5 @@
 
-import schedule from 'node-schedule';
+const schedule = require ('node-schedule');
 import { getSaveData, deleteAllData } from './Jobs/save-delete-data';
 import { setReminderForAll } from './Jobs/dailyReminders';
 
