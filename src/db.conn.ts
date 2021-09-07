@@ -7,6 +7,8 @@ let databaseUrl,
   ? (databaseUrl = `${process.env.DATABASE_URL}?sslmode=require`)
   : (databaseUrl = `postgres://${creds.username}:${creds.password}@${creds.host}:${creds.port}/${creds.database}`);
 
+  
+
 const postgresConn = new Sequelize(databaseUrl,{
   dialect: 'postgres',
   logging: false,

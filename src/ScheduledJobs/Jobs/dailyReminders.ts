@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
+import {getScheduledMessages} from '../../services/slackTasks'
 dayjs.extend(utc)
 dayjs.extend(timezone)
-
 
 
 const {
@@ -15,9 +15,12 @@ const { to } = require('await-to-js');
 
 const setReminder = async (city: string, fiqah: string, channel: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah Missing');
-
-  const res = await findPrayerTimeByCityAndFiqah(city, fiqah);
-
+  const [errSchMsg,dataSchMsg] = await to (getScheduledMessages(channel));
+  if(errSchMsg) throw new Error('Error Finding Scheduled Message');
+  if(dataSchMsg) return;
+  
+  const [err,res] = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
+  if(err) throw new Error('Error Finding Prayer Data');
   if (res.length <= 0) return;
 
   const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
