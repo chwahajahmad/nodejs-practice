@@ -30,9 +30,9 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   const { city, fiqah } = params;
   const { user_id, user_name, channel_id } = req.body;
 
-  const [errUserData, userData] = await to(findOneUser(user_id));
-  if (userData) return sendRes(response_url, errMsgs.USER_EXIST.msg);
+  const [errUserData, userData]:any = await to(findOneUser(user_id));
   if (errUserData) return sendRes(response_url, errMsgs.FETCH_USER_DATA.msg);
+  if (userData) return sendRes(response_url, errUserData.message);
 
   const [errSaveData] = await to(
     weeklyDataOperations.getSaveDataForSingleUser(city, fiqah),
