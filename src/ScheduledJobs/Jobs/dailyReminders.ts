@@ -1,12 +1,12 @@
-export { }
+export {};
 const dayjs = require('dayjs');
 const {
   findPrayerTimeByCityAndFiqah,
 } = require('../../utils/prayerTime.utils');
 const { postMessage } = require('../../services/slackTasks');
 const user = require('../../models/users.models');
-const setReminder = async (data) => {
-  const { city, fiqah } = data;
+const { to } = require('await-to-js');
+const setReminder = async (city: string, fiqah: string, channel: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah Missing');
 
   const res = await findPrayerTimeByCityAndFiqah(city, fiqah);
@@ -21,7 +21,6 @@ const setReminder = async (data) => {
     const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
 
     const message = `Its ${namazName} Time`;
-    const channel = data.slack_id;
 
     const timeStamp = dayjs(`${date} ${time}`).unix();
     const timeStampNow = dayjs().unix();
@@ -36,18 +35,14 @@ const setReminder = async (data) => {
   });
 };
 const setReminderForAll = async () => {
-  try {
-    const userData = await user.findAll();
+  const [err, userData] = await to(user.findAll());
+  if (err) throw Error(err);
 
-    console.log('Here Posting Reminders');
-    userData.forEach((data) => {
-      setReminder(data.dataValues);
-    });
-  } catch (err) {
-    throw Error(err);
-  }
+  userData.forEach((data: any) => {
+    const { city, fiqah, slack_id } = data.dataValues;
+    setReminder(city, fiqah, slack_id);
+  });
 };
-
 module.exports = {
   setReminder,
   setReminderForAll,

@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Sequelize = require('sequelize');
 const config = require('./config/config.json');
-const creds = config[process.env.NODE_ENV] || config['development'];
+let creds;
+process.env.NODE_ENV
+    ? (creds = config[process.env.NODE_ENV])
+    : (creds = config['development']);
 const postgresConn = new Sequelize(`postgres://${creds.username}:${creds.password}@${creds.host}:${creds.port}/${creds.database}`);
 postgresConn
     .authenticate()

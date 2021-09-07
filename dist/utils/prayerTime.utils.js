@@ -1,3 +1,4 @@
+"use strict";
 const prayerTime = require('../models/prayerTime.models');
 const findPrayerTimeByCityAndFiqah = (city, fiqah) => {
     return prayerTime.findAll({

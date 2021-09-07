@@ -1,18 +1,18 @@
-export { };
+export {};
 const web = require('../slack.conn');
 
-const getScheduledMessages = (channel) => {
+const getScheduledMessages = (channel: string) => {
   return web.chat.scheduledMessages.list({
     channel,
   });
 };
 
-const deleteScheduledMessage = async (channel) => {
+const deleteScheduledMessage = async (channel: string) => {
   try {
     const messages = await getScheduledMessages(channel);
 
     if (!messages) return;
-    messages.scheduled_messages.forEach((data) => {
+    messages.scheduled_messages.forEach((data: any) => {
       try {
         web.chat.deleteScheduledMessage({
           channel: data.channel_id,
@@ -27,7 +27,7 @@ const deleteScheduledMessage = async (channel) => {
   }
 };
 
-const postMessage = (text, channel, post_at) => {
+const postMessage = (text: string, channel: string, post_at: number) => {
   return web.chat.scheduleMessage({
     text,
     channel,

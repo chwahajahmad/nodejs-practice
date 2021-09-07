@@ -1,6 +1,6 @@
 const prayerTime = require('../models/prayerTime.models');
 
-const findPrayerTimeByCityAndFiqah = (city, fiqah) => {
+const findPrayerTimeByCityAndFiqah = (city: string, fiqah: string) => {
   return prayerTime.findAll({
     where: {
       city: city.toLowerCase(),
@@ -17,7 +17,11 @@ const deleteAll = () => {
   return prayerTime.destroy({ truncate: true });
 };
 
-const addPrayerTime = (weeklyData) => {
+const addPrayerTime = (weeklyData: {
+  city: string;
+  fiqah: string;
+  data: any;
+}) => {
   if (!weeklyData.city || !weeklyData.fiqah || !weeklyData.data)
     throw new Error('No Data To Add');
   const newPrayerTime = new prayerTime(weeklyData);

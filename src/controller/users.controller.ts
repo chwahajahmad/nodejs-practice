@@ -13,8 +13,9 @@ const {
 const { sendRes, findOneUser } = require('../utils/index');
 const { errMsgs, sucMsgs } = require('../utils/constants/responseMessages');
 const { to } = require('await-to-js');
+import { Request, Response, NextFunction } from 'express';
 
-const addUser = async (req, res, _next) => {
+const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   const result = userSchema(false).validate(req.body);
   if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
@@ -46,19 +47,12 @@ const addUser = async (req, res, _next) => {
   if (!userCreate) return sendRes(res, errMsgs.CREATING_USER.msg);
   if (errUserCreate) return sendRes(res, errMsgs.INTERNAL_ERR.msg);
 
-  const [errReminder] = await to(
-    setReminder({
-      ...req.body,
-      city,
-      fiqah,
-      slack_id: user_id,
-    }),
-  );
+  const [errReminder] = await to(setReminder(city, fiqah, user_id));
   if (errReminder) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
   return sendRes(res, sucMsgs.USER_SUB.msg);
 };
-const deleteUser = async (req, res, _next) => {
+const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
   const result = userSchema(true).validate(req.body);
   if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
@@ -74,18 +68,16 @@ const deleteUser = async (req, res, _next) => {
   );
   if (errScheduleMsg) return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
 
-  const [errDestroy] = await to(
-    user.destroy({
-      where: {
-        slack_id,
-      },
-    }),
-  );
+  const [errDestroy] = await to(user.destroy({ where: { slack_id } }));
   if (errDestroy) return sendRes(res, errMsgs.DELETE_USER);
 
   return sendRes(res, sucMsgs.DELETE_USER.msg);
 };
-const updateFiqah = async (req, res, _next) => {
+const updateFiqah = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   const result = userSchema(false).validate(req.body);
   if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
@@ -116,31 +108,16 @@ const updateFiqah = async (req, res, _next) => {
   if (saveDataErr) return sendRes(res, errMsgs.FETCH_CITY_DATA.msg);
 
   const [errSetReminder] = await to(
-    setReminder({
-      ...req.body,
-      city: userExist.dataValues.city,
-      slack_id,
-      fiqah,
-    }),
+    setReminder(userExist.dataValues.city, fiqah, slack_id),
   );
   if (errSetReminder) return sendRes(res, errMsgs.REMINDER_SET.msg);
-  const [errUpdate] = await to(
-    user.update(
-      {
-        fiqah,
-      },
-      {
-        where: {
-          slack_id,
-        },
-      },
-    ),
-  );
+
+  const [errUpdate] = await to(user.update({ fiqah }, { where: { slack_id } }));
   if (errUpdate) return sendRes(res, errMsgs.UPDATE_USER.msg);
 
   return sendRes(res, sucMsgs.FIQAH_UPDATE.msg);
 };
-const updateCity = async (req, res, _next) => {
+const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
   const result = userSchema(false).validate(req.body);
   if (result.error) return sendRes(res, errMsgs.INVALID_REQ.msg);
 
@@ -164,27 +141,11 @@ const updateCity = async (req, res, _next) => {
   if (deleteErr) return sendRes(res, errMsgs.DELETE_SCH_MSG.msg);
 
   const [reminderErr] = await to(
-    setReminder({
-      ...req.body,
-      fiqah: userExist.dataValues.fiqah,
-      slack_id,
-      city,
-    }),
+    setReminder(city, userExist.dataValues.fiqah, slack_id),
   );
   if (reminderErr) return sendRes(res, errMsgs.REMINDER_SET.msg);
 
-  const [updateErr] = await to(
-    user.update(
-      {
-        city,
-      },
-      {
-        where: {
-          slack_id,
-        },
-      },
-    ),
-  );
+  const [updateErr] = await to(user.update({ city }, { where: { slack_id } }));
   if (updateErr) return sendRes(res, errMsgs.UPDATE_USER.msg);
 
   return sendRes(res, sucMsgs.CITY_UPDATE.msg);

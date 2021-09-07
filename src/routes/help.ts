@@ -1,7 +1,7 @@
-export { };
+export {};
 const express = require('express');
 const router = express.Router();
-
+import { Request, Response } from 'express';
 const blockData = {
   blocks: [
     {
@@ -75,7 +75,7 @@ const blockData = {
   ],
 };
 
-router.post('/', (req, res) => {
+router.post('/', (req: Request, res: Response) => {
   if (req.body.command === '/helpforprayertimes') {
     res.status(200).json(blockData);
   }
