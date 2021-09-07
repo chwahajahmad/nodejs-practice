@@ -1,6 +1,6 @@
 export {};
 const web = require('../slack.conn');
-
+const { to } = require('await-to-js');
 const getScheduledMessages = (channel: string) => {
   return web.chat.scheduledMessages.list({
     channel,
@@ -8,23 +8,18 @@ const getScheduledMessages = (channel: string) => {
 };
 
 const deleteScheduledMessage = async (channel: string) => {
-  try {
-    const messages = await getScheduledMessages(channel);
-
-    if (!messages) return;
-    messages.scheduled_messages.forEach((data: any) => {
-      try {
-        web.chat.deleteScheduledMessage({
-          channel: data.channel_id,
-          scheduled_message_id: data.id,
-        });
-      } catch (err) {
-        throw Error('Error Deleting Scheduled Messages');
-      }
-    });
-  } catch (err) {
-    throw Error('Error Getting Scheduled Messages list');
-  }
+  const [errGettingMsg, messages] = await to(getScheduledMessages(channel));
+  if (errGettingMsg) throw Error('Error Getting Scheduled Messages list');
+  messages.scheduled_messages.forEach((data: any) => {
+    try {
+      web.chat.deleteScheduledMessage({
+        channel: data.channel_id,
+        scheduled_message_id: data.id,
+      });
+    } catch (err) {
+      throw Error('Error Deleting Scheduled Messages');
+    }
+  });
 };
 
 const postMessage = (text: string, channel: string, post_at: number) => {
