@@ -15,12 +15,13 @@
     "port":"5432",
     "dialect": "postgres"
   },
-  "production": {
-    "username": "ryacyvkcryuowf",
-    "password": "686797c9709c409897fe2d37d76b0da9e8f357b3f93091596922b04460cd8359",
-    "database": "ddoa65n168mj6m",
-    "host": "ec2-54-145-185-178.compute-1.amazonaws.com",
-    "port":"5432",
-    "dialect": "postgres"
+   "production": {
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "rejectUnauthorized": false
+      }
+    }
   }
 }

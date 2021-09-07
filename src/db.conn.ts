@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-import config from './config/config.json';
+import * as config from './config/config.json';
 
 let databaseUrl,
   creds = config['development'];
