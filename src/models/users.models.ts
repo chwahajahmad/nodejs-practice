@@ -39,8 +39,4 @@ const findOneUser = (id: string) => {
     },
   });
 };
-// user
-//   .sync()
-//   .then((res) => console.log(res))
-//   .catch((err) => console.log(err));
 module.exports = { users, findOneUser };

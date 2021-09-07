@@ -2,14 +2,13 @@ export {};
 const Sequelize = require('sequelize');
 const config = require('./config/config.json');
 
-let creds;
-process.env.NODE_ENV
-  ? (creds = config[process.env.NODE_ENV])
-  : (creds = config['development']);
+let databaseUrl,
+  creds = config['development'];
+process.env.NODE_ENV === 'production'
+  ? (databaseUrl = process.env.DATABASE_URL)
+  : (databaseUrl = `postgres://${creds.username}:${creds.password}@${creds.host}:${creds.port}/${creds.database}`);
 
-const postgresConn = new Sequelize(
-  `postgres://${creds.username}:${creds.password}@${creds.host}:${creds.port}/${creds.database}`,
-);
+const postgresConn = new Sequelize(databaseUrl);
 
 postgresConn
   .authenticate()

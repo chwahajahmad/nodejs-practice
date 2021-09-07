@@ -16,10 +16,10 @@
     "dialect": "postgres"
   },
   "production": {
-     "username": "wahaj_choudhry",
-    "password": 12345,
-    "database": "prayerTime-DB",
-    "host": "127.0.0.1",
+    "username": "ryacyvkcryuowf",
+    "password": "686797c9709c409897fe2d37d76b0da9e8f357b3f93091596922b04460cd8359",
+    "database": "ddoa65n168mj6m",
+    "host": "ec2-54-145-185-178.compute-1.amazonaws.com",
     "port":"5432",
     "dialect": "postgres"
   }
