@@ -13,10 +13,10 @@ const postgresConn = new Sequelize(databaseUrl,{
   dialect: 'postgres',
   logging: false,
   dialectOptions: {
-    ssl: {
+    ...(process.env.NODE_ENV && {ssl: {
       require: true,
-      rejectUnauthorized: false, // very important
-    }
+      rejectUnauthorized: false, 
+    }})
   }
 });
 postgresConn
