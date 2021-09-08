@@ -23,9 +23,8 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
 
   prayerTimes.forEach((namazName) => {
     const timezone = res[0].dataValues.data.location.timezone;
-    const timeNow = dayjs().format('YYYY-MM-DD HH:mm').toString();
-    const timeStampNow = dayjs.tz(timeNow, timezone).unix();
-    const day = dayjs.tz(timeNow, timezone).day();
+    const timeStampNow = dayjs().unix();
+    const day = dayjs().day();
     const time = res[0].dataValues.data.datetime[day].times[namazName];
     const date = res[0].dataValues.data.datetime[day].date.gregorian;
     const message = `Its ${namazName} Time`;
