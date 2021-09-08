@@ -32,6 +32,7 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
     
     
     const timeStamp = dayjs.tz(`${date} ${time}`,timezone).unix();
+    console.log(timeStampNow,timeStamp,day)
     if (timeStampNow < timeStamp) {
       try {
         postMessage(message, channel, timeStamp);
