@@ -1,5 +1,4 @@
-export {};
-const Joi = require('joi');
+import Joi from 'joi';
 
 const fiqahValidator = (fiqah: string) => {
   if (!fiqah) throw new Error('Fiqah Missing');

@@ -31,18 +31,13 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   const { user_id, user_name, channel_id } = req.body;
 
   const [errUserData, userData] = await to(findOneUser(user_id));
-  if (errUserData) return sendRes(response_url,errUserData.message);
+  if (errUserData) return sendRes(response_url,errMsgs.FETCH_USER_DATA.msg);
   if (userData) return sendRes(response_url, errMsgs.USER_EXIST.msg);
 
   const [errSaveData] = await to(
     weeklyDataOperations.getSaveDataForSingleUser(city, fiqah),
   );
   if (errSaveData) return sendRes(response_url, errMsgs.FETCH_CITY_DATA.msg);
-  const [errReminder] = await to(
-    dailyReminders.setReminder(city, fiqah, user_id),
-  );
-  if (errReminder) return sendRes(response_url, errReminder.message);
-
   const [errUserCreate, userCreate] = await to(
     users.create({
       slack_id: user_id,
@@ -55,7 +50,11 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   if (!userCreate) return sendRes(response_url, errMsgs.CREATING_USER.msg);
   if (errUserCreate) return sendRes(response_url, errMsgs.INTERNAL_ERR.msg);
 
- 
+  const [errReminder] = await to(
+    dailyReminders.setReminder(city, fiqah, user_id),
+  );
+  if (errReminder) return sendRes(response_url, errMsgs.REMINDER_SET.msg);
+
   return sendRes(response_url, sucMsgs.USER_SUB.msg);
 };
 const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
@@ -76,7 +75,7 @@ const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
   const [errScheduleMsg] = await to(
     deleteScheduledMessage(userExist.dataValues.channel_id),
   );
-  if (errScheduleMsg) return sendRes(response_url, errScheduleMsg.message);
+  if (errScheduleMsg) return sendRes(response_url, errMsgs.DELETE_SCH_MSG.msg);
 
   const [errDestroy] = await to(users.destroy({ where: { slack_id } }));
   if (errDestroy) return sendRes(response_url, errMsgs.DELETE_USER.msg);
