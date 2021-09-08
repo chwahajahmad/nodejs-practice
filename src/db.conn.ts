@@ -9,16 +9,7 @@ let databaseUrl,
 
   
 
-const postgresConn = new Sequelize(databaseUrl,{
-  dialect: 'postgres',
-  logging: false,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false, // very important
-    }
-  }
-});
+const postgresConn = new Sequelize(databaseUrl);
 postgresConn
   .authenticate()
   .then(() => {

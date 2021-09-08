@@ -1,12 +1,13 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
-import {getScheduledMessages} from '../../services/slackTasks'
+import { getTimezoneOffset } from '../../utils/basic-helpers';
+
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-
 const {
+
   findPrayerTimeByCityAndFiqah,
 } = require('../../models/prayerTime.models');
 const { postMessage } = require('../../services/slackTasks');
@@ -24,7 +25,7 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
   prayerTimes.forEach((namazName) => {
     const timezone = res[0].dataValues.data.location.timezone;
     const timeStampNow = dayjs().unix();
-    let day = dayjs().day();
+    let day = dayjs().add(getTimezoneOffset(timezone, dayjs()),'hours').day();
     day === 0 ? day = 6 : day -=1;
     const time = res[0].dataValues.data.datetime[day].times[namazName];
     const date = res[0].dataValues.data.datetime[day].date.gregorian;

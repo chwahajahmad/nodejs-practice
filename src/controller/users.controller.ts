@@ -9,7 +9,7 @@ import {
   dailyReminders,
   weeklyDataOperations,
 } from '../ScheduledJobs/Jobs/index';
-import { sendRes } from '../utils/resSender';
+import { sendRes } from '../utils/basic-helpers';
 import { errMsgs, sucMsgs } from '../utils/constants/responseMessages';
 import { to } from 'await-to-js';
 import { Request, Response, NextFunction } from 'express';
