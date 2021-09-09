@@ -13,7 +13,7 @@ const blockData = {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Use the `/subscribe` command*. Type `/subscribe` followed by --your city --your fiqah. Make sure to use this command in direct message. Try it out by using the `/task` command in this channel.\n `Note: If your city contain spaces, replace space with "-" sign.`',
+        text: '*Use the `/subscribe` command*. Type `/subscribe` followed by --your city --your fiqah. Make sure to use this command in direct message. Try it out by using the `/subscribe` command in this channel.\n `Note: If your city contain spaces, replace space with "-" sign.`',
       },
     },
     {
