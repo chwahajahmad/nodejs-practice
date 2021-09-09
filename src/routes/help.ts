@@ -6,14 +6,14 @@ const blockData = {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: "Hey there 👋 I'm Prayer Bot. I'm here to remind you to offer prayer.\nYou can subscribe to alerts using following command:",
+        text: "Hey there 👋 I'm Prayer Reminder Bot. I'm here to remind you to offer prayer. You have to subscribe to get alerts . You can subscribe to alerts using following command:",
       },
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '*Use the `/subscribe` command*. Type `/subscribe` followed by --your city --your fiqah. Try it out by using the `/task` command in this channel.',
+        text: '*Use the `/subscribe` command*. Type `/subscribe` followed by --your city --your fiqah. Make sure to use this command in direct message. Try it out by using the `/task` command in this channel.\n `Note: If your city contain spaces, replace space with "-" sign.`',
       },
     },
     {
