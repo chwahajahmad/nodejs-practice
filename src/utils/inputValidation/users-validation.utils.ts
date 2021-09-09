@@ -28,7 +28,7 @@ const cityFiqahSeperator = (text: string) => {
   )
     return {
       status: false,
-      message: 'Make Sure You have added City and Fiqah',
+      message: 'Invalid Request',
       city: '',
       fiqah: '',
     };
