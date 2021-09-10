@@ -1,10 +1,10 @@
-const sucMsgs = {
+export const sucMsgs = {
   USER_SUB: { stats: 200, msg: 'User Subscribed Successfully!' },
   CITY_UPDATE: { stats: 200, msg: 'City Updated Successfully!' },
   FIQAH_UPDATE: { stats: 200, msg: 'Fiqah Updated Successfully!' },
   DELETE_USER: { stats: 200, msg: 'User Unsubscribed Successfully!' },
 };
-const errMsgs = {
+export const errMsgs = {
   INTERNAL_ERR: {
     status: 500,
     msg: 'Internal Error.',
@@ -63,4 +63,3 @@ const errMsgs = {
   },
 };
 
-export { sucMsgs, errMsgs };

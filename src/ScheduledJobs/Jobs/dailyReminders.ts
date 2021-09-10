@@ -1,13 +1,7 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
-import { getTimezoneOffset } from '../../utils/basic-helpers';
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
+// change exports and imports as exampled
+export {};
+const dayjs = require('dayjs');
 const {
-
   findPrayerTimeByCityAndFiqah,
 } = require('../../models/prayerTime.models');
 const { postMessage } = require('../../services/slackTasks');
@@ -16,24 +10,23 @@ const { to } = require('await-to-js');
 
 const setReminder = async (city: string, fiqah: string, channel: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah Missing');
-  const [err,res] = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
-  if(err) throw new Error('Error Finding Prayer Data');
+
+  const res = await findPrayerTimeByCityAndFiqah(city, fiqah);
+
   if (res.length <= 0) return;
 
   const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
   prayerTimes.forEach((namazName) => {
-    const timezone = res[0].dataValues.data.location.timezone;
-    const timeStampNow = dayjs().unix();
-    let day = dayjs().add(getTimezoneOffset(timezone, dayjs()),'hours').day();
-    day === 0 ? day = 6 : day -=1;
-    const time = res[0].dataValues.data.datetime[day].times[namazName];
-    const date = res[0].dataValues.data.datetime[day].date.gregorian;
+    const day = new Date().getDay();
+    const time = res[0].dataValues.data.datetime[day - 1].times[namazName];
+    const date = res[0].dataValues.data.datetime[day - 1].date.gregorian;
+
     const message = `Its ${namazName} Time`;
-    
-    
-    const timeStamp = dayjs.tz(`${date} ${time}`,timezone).unix();
-    console.log(timeStampNow,timeStamp,day)
+
+    const timeStamp = dayjs(`${date} ${time}`).unix();
+    const timeStampNow = dayjs().unix();
+
     if (timeStampNow < timeStamp) {
       try {
         postMessage(message, channel, timeStamp);
@@ -52,4 +45,7 @@ const setReminderForAll = async () => {
     setReminder(city, fiqah, slack_id);
   });
 };
-export { setReminder, setReminderForAll };
+module.exports = {
+  setReminder,
+  setReminderForAll,
+};
