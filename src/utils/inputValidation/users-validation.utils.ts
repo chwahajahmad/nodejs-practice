@@ -1,21 +1,25 @@
-export const Joi = require('joi');
+import Joi from 'joi';
 
-export const fiqahValidator = (fiqah: string) => {
+const fiqahValidator = (fiqah: string) => {
   if (!fiqah) throw new Error('Fiqah Missing');
   fiqah = fiqah.trim();
   if (!(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi'))
     return {
       status: false,
       message: 'Fiqah Should Be Hanafi or Jafari',
+      city: '',
+      fiqah: '',
     };
 
   return {
     status: true,
     message: 'All Good!',
+    city: '',
+    fiqah: '',
   };
 };
 
-export const cityFiqahSeperator = (text: string) => {
+const cityFiqahSeperator = (text: string) => {
   if (
     !text ||
     text.length <= 0 ||
@@ -24,8 +28,7 @@ export const cityFiqahSeperator = (text: string) => {
   )
     return {
       status: false,
-      message:
-        'Something wrong with your command. \n Make sure you have used this command: `subscribe --city --fiqah`',
+      message: 'Invalid Request',
       city: '',
       fiqah: '',
     };
@@ -42,10 +45,15 @@ export const cityFiqahSeperator = (text: string) => {
   const fiqahValidation = fiqahValidator(fiqah);
 
   if (!fiqahValidation.status) return fiqahValidation;
-  return { status: true, city: city.toLowerCase(), fiqah: fiqah.toLowerCase() };
+  return {
+    status: true,
+    message: 'Successfully Return',
+    city: city.toLowerCase(),
+    fiqah: fiqah.toLowerCase(),
+  };
 };
 
-export const userSchema = (omitText: string) =>
+const userSchema = (omitText: boolean) =>
   Joi.object()
     .keys({
       command: Joi.string().required(),
@@ -57,3 +65,5 @@ export const userSchema = (omitText: string) =>
       channel_name: Joi.string().required(),
     })
     .unknown(true);
+
+export { cityFiqahSeperator, fiqahValidator, userSchema };

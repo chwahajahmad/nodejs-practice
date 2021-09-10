@@ -14,8 +14,12 @@ import { errMsgs, sucMsgs } from '../utils/constants/responseMessages';
 import { to } from 'await-to-js';
 import { Request, Response, NextFunction } from 'express';
 
-const addUser = async (req: Request, res: Response, _next: NextFunction) => {
-  res.status(200).json({text:'Working on your request...'});
+export const addUser = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
+  res.status(200).json({ text: 'Working on your request...' });
   const { response_url } = req.body;
   const result = userSchema(false).validate(req.body);
   if (result.error) return sendRes(response_url, errMsgs.INVALID_REQ.msg);
@@ -31,7 +35,7 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
   const { user_id, user_name, channel_id } = req.body;
 
   const [errUserData, userData] = await to(findOneUser(user_id));
-  if (errUserData) return sendRes(response_url,errMsgs.FETCH_USER_DATA.msg);
+  if (errUserData) return sendRes(response_url, errMsgs.FETCH_USER_DATA.msg);
   if (userData) return sendRes(response_url, errMsgs.USER_EXIST.msg);
 
   const [errSaveData] = await to(
@@ -57,7 +61,11 @@ const addUser = async (req: Request, res: Response, _next: NextFunction) => {
 
   return sendRes(response_url, sucMsgs.USER_SUB.msg);
 };
-const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   res.status(200).send('Working on your request...');
   const { response_url } = req.body;
 
@@ -82,7 +90,7 @@ const deleteUser = async (req: Request, res: Response, _next: NextFunction) => {
 
   return sendRes(response_url, sucMsgs.DELETE_USER.msg);
 };
-const updateFiqah = async (
+export const updateFiqah = async (
   req: Request,
   res: Response,
   _next: NextFunction,
@@ -134,7 +142,11 @@ const updateFiqah = async (
 
   return sendRes(response_url, sucMsgs.FIQAH_UPDATE.msg);
 };
-const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
+export const updateCity = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   res.status(200).send('Working on your request...');
   const { response_url } = req.body;
 
@@ -173,5 +185,3 @@ const updateCity = async (req: Request, res: Response, _next: NextFunction) => {
 
   return sendRes(response_url, sucMsgs.CITY_UPDATE.msg);
 };
-
-export { addUser, deleteUser, updateFiqah, updateCity };

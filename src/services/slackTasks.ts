@@ -1,5 +1,4 @@
-// const web = require('../slack.conn');
-import web from '../slack.conn';
+const { web } = require('../slack.conn');
 import { to } from 'await-to-js';
 
 export const getScheduledMessages = (channel: string) => {
@@ -9,7 +8,9 @@ export const getScheduledMessages = (channel: string) => {
 };
 
 export const deleteScheduledMessage = async (channel: string) => {
-  const [errGettingMsg, messages] = await to(getScheduledMessages(channel));
+  const [errGettingMsg, messages]: any = await to(
+    getScheduledMessages(channel),
+  );
   if (errGettingMsg) throw Error('Error Getting Scheduled Messages list');
   messages.scheduled_messages.forEach((data: any) => {
     try {
