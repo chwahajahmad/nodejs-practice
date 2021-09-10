@@ -28,7 +28,8 @@ export const cityFiqahSeperator = (text: string) => {
   )
     return {
       status: false,
-      message: 'Invalid Request',
+      message:
+        'Something wrong with your command. \n Make sure you have used this command: `subscribe --city --fiqah`',
       city: '',
       fiqah: '',
     };
