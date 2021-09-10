@@ -1,4 +1,4 @@
-const { web } = require('../slack.conn');
+const web = require('../slack.conn');
 import { to } from 'await-to-js';
 
 export const getScheduledMessages = (channel: string) => {
