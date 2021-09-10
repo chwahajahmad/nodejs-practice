@@ -105,10 +105,7 @@ export const updateFiqah = async (
   const slack_id = req.body.user_id;
 
   const details = fiqahValidator(fiqah);
-  if (!details.status)
-    return res.status(200).json({
-      text: details.message,
-    });
+  if (!details.status) return sendRes(response_url, details.message);
 
   const [userFetchError, userExist]: any = await to(findOneUser(slack_id));
   if (userFetchError) return sendRes(response_url, errMsgs.FETCH_USER_DATA.msg);
