@@ -1,8 +1,7 @@
-const { Sequelize } = require('sequelize');
-import { DataTypes } from 'sequelize';
+import Sequelize, { DataTypes } from 'sequelize';
 import db from '../db.conn';
 
-const weekly_prayer_data = db.define(
+export const weekly_prayer_data = db.define(
   'weekly_prayer_data',
   {
     // Model attributes are defined here
@@ -29,7 +28,7 @@ const weekly_prayer_data = db.define(
   },
 );
 
-const findPrayerTimeByCityAndFiqah = (city: string, fiqah: string) => {
+export const findPrayerTimeByCityAndFiqah = (city: string, fiqah: string) => {
   return weekly_prayer_data.findAll({
     where: {
       city: city.toLowerCase(),
@@ -38,15 +37,15 @@ const findPrayerTimeByCityAndFiqah = (city: string, fiqah: string) => {
   });
 };
 
-const findPrayerTime = () => {
+export const findPrayerTime = () => {
   return weekly_prayer_data.findAll();
 };
 
-const deleteAllPrayerTimes = () => {
+export const deleteAllPrayerTimes = () => {
   return weekly_prayer_data.destroy({ truncate: true });
 };
 
-const addPrayerTime = (weeklyData: {
+export const addPrayerTime = (weeklyData: {
   city: string;
   fiqah: string;
   data: any;
@@ -55,12 +54,4 @@ const addPrayerTime = (weeklyData: {
     throw new Error('No Data To Add');
   const newPrayerTime = new weekly_prayer_data(weeklyData);
   return newPrayerTime.save();
-};
-
-export {
-  findPrayerTime,
-  findPrayerTimeByCityAndFiqah,
-  deleteAllPrayerTimes,
-  addPrayerTime,
-  weekly_prayer_data,
 };

@@ -5,4 +5,5 @@ const router = express.Router();
 router.post('/', (req: Request, res: Response, next: NextFunction) => {
   addUser(req, res, next);
 });
+
 export default router;

@@ -1,23 +1,23 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone' // dependent on utc plugin
+import timezone from 'dayjs/plugin/timezone';
 import { getTimezoneOffset } from '../../utils/basic-helpers';
+import { findPrayerTimeByCityAndFiqah } from '../../models/prayerTime.models';
+import { postMessage } from '../../services/slackTasks';
+import { users } from '../../models/users.models';
+import { to } from 'await-to-js';
 
-dayjs.extend(utc)
-dayjs.extend(timezone)
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-const {
-
-  findPrayerTimeByCityAndFiqah,
-} = require('../../models/prayerTime.models');
-const { postMessage } = require('../../services/slackTasks');
-const { users } = require('../../models/users.models');
-const { to } = require('await-to-js');
-
-const setReminder = async (city: string, fiqah: string, channel: string) => {
+export const setReminder = async (
+  city: string,
+  fiqah: string,
+  channel: string,
+) => {
   if (!city || !fiqah) throw new Error('City or Fiqah Missing');
-  const [err,res] = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
-  if(err) throw new Error('Error Finding Prayer Data');
+  const [err, res]: any = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
+  if (err) throw new Error('Error Finding Prayer Data');
   if (res.length <= 0) return;
 
   const prayerTimes = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
@@ -25,15 +25,14 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
   prayerTimes.forEach((namazName) => {
     const timezone = res[0].dataValues.data.location.timezone;
     const timeStampNow = dayjs().unix();
-    let day = dayjs().add(getTimezoneOffset(timezone, dayjs()),'hours').day();
-    day === 0 ? day = 6 : day -=1;
+    let day = dayjs().add(getTimezoneOffset(timezone, dayjs()), 'hours').day();
+    day === 0 ? (day = 6) : (day -= 1);
     const time = res[0].dataValues.data.datetime[day].times[namazName];
     const date = res[0].dataValues.data.datetime[day].date.gregorian;
     const message = `Its ${namazName} Time`;
-    
-    
-    const timeStamp = dayjs.tz(`${date} ${time}`,timezone).unix();
-    console.log(timeStampNow,timeStamp,day)
+
+    const timeStamp = dayjs.tz(`${date} ${time}`, timezone).unix();
+    console.log(timeStampNow, timeStamp, day);
     if (timeStampNow < timeStamp) {
       try {
         postMessage(message, channel, timeStamp);
@@ -43,8 +42,8 @@ const setReminder = async (city: string, fiqah: string, channel: string) => {
     }
   });
 };
-const setReminderForAll = async () => {
-  const [err, userData] = await to(users.findAll());
+export const setReminderForAll = async () => {
+  const [err, userData]: any = await to(users.findAll());
   if (err) throw Error(err);
 
   userData.forEach((data: any) => {
@@ -52,4 +51,3 @@ const setReminderForAll = async () => {
     setReminder(city, fiqah, slack_id);
   });
 };
-export { setReminder, setReminderForAll };

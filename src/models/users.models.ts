@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import db from '../db.conn';
 
-const users = db.define(
+export const users = db.define(
   'users',
   {
     // Model attributes are defined here
@@ -30,7 +30,7 @@ const users = db.define(
     freezeTableName: true,
   },
 );
-const findOneUser = (id: string) => {
+export const findOneUser = (id: string) => {
   if (!id) throw new Error('ID Missing'); //Validation
   return users.findOne({
     where: {
@@ -38,4 +38,3 @@ const findOneUser = (id: string) => {
     },
   });
 };
-export { users, findOneUser };

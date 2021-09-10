@@ -6,7 +6,7 @@ import updateCityRoute from './updateCity';
 import express from 'express';
 const router = express.Router();
 
-const routes = () => {
+export default () => {
   router.use('/subscribe', subscribeRoute);
   router.use('/unsubscribe', unsubscribeRoute);
   router.use('/helpforprayertimes', helpRoute);
@@ -14,5 +14,3 @@ const routes = () => {
   router.use('/updatefiqah', updateFiqahRoute);
   return router;
 };
-
-export default routes;

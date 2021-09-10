@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const fiqahValidator = (fiqah: string) => {
+export const fiqahValidator = (fiqah: string) => {
   if (!fiqah) throw new Error('Fiqah Missing');
   fiqah = fiqah.trim();
   if (!(fiqah.toLowerCase() === 'jafari' || fiqah.toLowerCase() === 'hanafi'))
@@ -19,7 +19,7 @@ const fiqahValidator = (fiqah: string) => {
   };
 };
 
-const cityFiqahSeperator = (text: string) => {
+export const cityFiqahSeperator = (text: string) => {
   if (
     !text ||
     text.length <= 0 ||
@@ -53,7 +53,7 @@ const cityFiqahSeperator = (text: string) => {
   };
 };
 
-const userSchema = (omitText: boolean) =>
+export const userSchema = (omitText: boolean) =>
   Joi.object()
     .keys({
       command: Joi.string().required(),
@@ -65,5 +65,3 @@ const userSchema = (omitText: boolean) =>
       channel_name: Joi.string().required(),
     })
     .unknown(true);
-
-export { cityFiqahSeperator, fiqahValidator, userSchema };

@@ -7,7 +7,7 @@ import {
 import { users } from '../../models/users.models';
 import { to } from 'await-to-js';
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
-const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
+export const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah is Missing');
 
   const [err, res]: any = await to(findPrayerTimeByCityAndFiqah(city, fiqah));
@@ -33,7 +33,7 @@ const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
   if (errAddingData) throw new Error(err);
 };
 
-const getSaveData = async () => {
+export const getSaveData = async () => {
   const [err, userData]: any = await to(users.findAll());
   if (err) throw new Error('Error Fetching User Data');
   userData.forEach((data: any) => {
@@ -42,9 +42,7 @@ const getSaveData = async () => {
   });
 };
 
-const deleteAllData = async () => {
+export const deleteAllData = async () => {
   const [err] = await to(deleteAllPrayerTimes());
   if (err) throw Error('Error Deleting Prayer Times');
 };
-
-export { getSaveDataForSingleUser, deleteAllData, getSaveData };
