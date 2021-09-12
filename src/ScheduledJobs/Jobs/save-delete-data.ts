@@ -38,7 +38,7 @@ export const getSaveData = async () => {
   if (err) throw new Error('Error Fetching User Data');
   userData.forEach((data: any) => {
     const { city, fiqah } = data.dataValues;
-    getSaveDataForSingleUser(city, fiqah);
+    (async () => await to(getSaveDataForSingleUser(city, fiqah)))();
   });
 };
 
