@@ -14,7 +14,7 @@ export const weeklyDataGetterScheduler = new CronJob(
 );
 
 export const dailyReminderScheduler = new CronJob(
-  '07 00 */1 */1 *',
+  '36 04 */1 */1 *',
   function () {
     setReminderForAll();
   },
