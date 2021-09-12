@@ -3,7 +3,7 @@ import { getSaveData, deleteAllData } from './Jobs/save-delete-data';
 import { setReminderForAll } from './Jobs/dailyReminders';
 
 export const weeklyDataGetterScheduler = new CronJob(
-  '28 04 * * 1',
+  '32 04 * * 1',
   function () {
     deleteAllData();
     getSaveData();
