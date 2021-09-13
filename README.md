@@ -1,4 +1,5 @@
 
+
 # Slack Prayer Reminder
 Prayer Reminder built using typescript, nodejs, postgresql and Slack Dev API.
 
@@ -20,12 +21,12 @@ $ cd slack-PrayerBot
  1. Connect with postgresql db 
 	  1. Setup your postgresql db.
 
-		2. Go to  ``
-src -> config -> config.json
- ``
-	 3.  Copy your db credentials to ***development*** key you find in the           ***config.json*** file.
+		2. Go to  src -> config -> config.json
+		
+	  3.  Copy your db credentials to ***development*** key you find in the ***config.json*** file.
  
 2. Integrate with slack bot
+
 	1. Go to Slack's development website. Create new app and install it into the required workspace.
 
 	2. Copy **oAuth** token. 
