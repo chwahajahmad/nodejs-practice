@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+import { Sequelize } from 'sequelize';
 import * as config from './config/config.json';
 
 let databaseUrl,

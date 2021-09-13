@@ -6,6 +6,7 @@ import {
 } from '../../models/prayerTime.models';
 import { users } from '../../models/users.models';
 import { to } from 'await-to-js';
+import postgresConn from '../../db.conn';
 const apiEndPoint = 'https://api.pray.zone/v2/times/this_week.json?';
 export const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
   if (!city || !fiqah) throw new Error('City or Fiqah is Missing');
@@ -34,11 +35,17 @@ export const getSaveDataForSingleUser = async (city: string, fiqah: string) => {
 };
 
 export const getSaveData = async () => {
-  const [err, userData]: any = await to(users.findAll());
+  const [err, userData]: any = await to(
+    postgresConn.query('select distinct city,fiqah from users', {
+      model: users,
+      mapToModel: true,
+    }),
+  );
   if (err) throw new Error('Error Fetching User Data');
+
   userData.forEach((data: any) => {
     const { city, fiqah } = data.dataValues;
-    (async () => await to(getSaveDataForSingleUser(city, fiqah)))();
+    getSaveDataForSingleUser(city, fiqah);
   });
 };
 
