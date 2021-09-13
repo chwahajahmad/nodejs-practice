@@ -21,7 +21,7 @@ $ cd slack-PrayerBot
  1. Connect with postgresql db 
 	  1. Setup your postgresql db.
 
-		2. Go to  src -> config -> config.json
+	  2. Go to  ```src -> config -> config.json```
 		
 	  3.  Copy your db credentials to ***development*** key you find in the ***config.json*** file.
  
