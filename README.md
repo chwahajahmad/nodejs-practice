@@ -2,7 +2,7 @@
 Prayer Reminder built using typescript, nodejs, postgresql and Slack Dev API.
 
 ### Features
-- User can Subscribe/Unsubscribe to Prayer Reminder bot using by sending it a message.
+- User can Subscribe/Unsubscribe to Prayer Reminder bot by sending it a message.
 - User can Update his city/fiqah by sending it a message.
 - Subscribed user will get alerts at each prayer time according on his city and fiqah.
 
