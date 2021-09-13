@@ -1,9 +1,12 @@
+
 # Slack Prayer Reminder
 Prayer Reminder built using typescript, nodejs, postgresql and Slack Dev API.
 
 ### Features
 - User can Subscribe/Unsubscribe to Prayer Reminder bot by sending it a message.
+
 - User can Update his city/fiqah by sending it a message.
+
 - Subscribed user will get alerts at each prayer time according on his city and fiqah.
 
 ### Getting Started
@@ -15,16 +18,19 @@ $ cd slack-PrayerBot
 **2. Setup the InstaClone app (development)**
 
  1. Connect with postgresql db 
--- Setup your postgresql db.
- -- Go to  ``
+	  1. Setup your postgresql db.
+
+		2. Go to  ``
 src -> config -> config.json
  ``
- -- Copy your db credentials to ***development*** key you find in the           ***config.json*** file.
+	 3.  Copy your db credentials to ***development*** key you find in the           ***config.json*** file.
  
 2. Integrate with slack bot
--- Go to Slack's development website. Create new app and install it into the required workspace.
--- Copy **oAuth** token. 
--- Create **.env** file. Add variable of name **SLACKBOT_OAUTH_TOKEN** and set it to your copied **oAuth** token.
+	1. Go to Slack's development website. Create new app and install it into the required workspace.
+
+	2. Copy **oAuth** token. 
+
+	3. Create **.env** file. Add variable of name **SLACKBOT_OAUTH_TOKEN** and set it to your copied **oAuth** token.
 
 **3. Start App**
 
